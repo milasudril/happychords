@@ -19,3 +19,9 @@
 *.exe
 *.out
 *.app
+
+private
+backend/__wand_targets_dbg
+backend/__wand_targets_rel
+ui/__wand_targets_dbg
+ui/__wand_targets_rel
