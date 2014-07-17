@@ -5,7 +5,11 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix urid: <http://lv2plug.in/ns/ext/urid#> .
 
-@prefix guiext: <http://lv2plug.in/ns/extensions/ui#>.
+@prefix ui: <http://lv2plug.in/ns/extensions/ui#>.
+
+<http://example.org/happychords#UI>
+    a <http://kxstudio.sf.net/ns/lv2ext/external-ui#Widget> ;
+    ui:binary <happychords-ui.so> .
 
 <http://example.org/happychords>
 	a lv2:Plugin;
@@ -13,6 +17,7 @@
 	lv2:binary <happychords.so>;
 	doap:name "Happychords";
 	doap:license <http://usefulinc.com/doap/licenses/gpl>;
+	ui:ui <http://example.org/happychords#UI> ;
 
 lv2:port
 	[
@@ -174,7 +179,7 @@ lv2:port
 	lv2:name "Choir/Sustain";
 	lv2:default 0.5 ;
 	lv2:minimum 0.0 ;
-	lv2:maximum 2.0 ;
+	lv2:maximum 1.0 ;
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;

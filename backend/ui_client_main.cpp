@@ -8,5 +8,5 @@ target[name[happychords-ui.so] type [lib_dynamic] platform[;GNU/Linux]]
 
 const LV2UI_Descriptor& LV2Plug::ui_main()
 	{
-	return LV2Plug::descriptorGet<Happychords::UiClient>();
+	return LV2Plug::UiWrapper<Happychords::UiClient>::uiDescriptorGet();
 	}
