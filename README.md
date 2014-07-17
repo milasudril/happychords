@@ -9,4 +9,4 @@ Dependencies
 * mustudio
 * synthmod
  
-The idea is to build a GUI using Windows API and use sockets + Wine for dealing with the UI.
+The idea is to build a GUI using Windows API and use sockets + Wine for dealing with the UI. This makes it possible to control the plugin through network.
