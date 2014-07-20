@@ -13,7 +13,7 @@ Happychords::Ui::UiRunner::UiRunner(Herbs::LogWriter& log,Herbs::Directory&& con
 	:Gui::Gui(my_sysout),connection(config),msg_receiver(my_sysout)
 	{
 	::Gui::WindowCustom::init();
-	mainwin=Mainwin::create(*this,0,0,nullptr);
+	mainwin=Mainwin::create(*this,0,0,nullptr,connection);
 	msg_receiver.sourceSet(connection);
 	msg_receiver.destSet(*mainwin);
 	msg_thread=new Herbs::Thread(msg_receiver);
@@ -31,7 +31,7 @@ Happychords::Ui::UiRunner::UiRunner(Herbs::LogWriter& log,Herbs::Directory&& con
 
 Happychords::Ui::UiRunner::~UiRunner()
 	{
-//	delete msg_thread;
+	delete msg_thread;
 	}
 
 void Happychords::Ui::UiRunner::destroy()

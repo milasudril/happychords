@@ -11,9 +11,14 @@ target[name[ui_client.o] type[object]]
 #include <herbs/stringformat/stringformat.h>
 #include <herbs/intformat/intformat.h>
 #include <herbs/exceptionmissing/exceptionmissing.h>
+#include <herbs/thread/thread.h>
 
 Happychords::Plugin::UiClient::~UiClient()
-	{delete remote;}
+	{
+	msg_receiver.terminateSet();
+	ui_bridge.messageSend({Bridge::Message::Type::TERMINATE,{{0}}});
+	delete msg_thread;
+	}
 
 	
 Happychords::Plugin::UiClient::UiClient(const char* path_bundle
@@ -23,18 +28,14 @@ Happychords::Plugin::UiClient::UiClient(const char* path_bundle
 		 {"127.0.0.1",65535}
 		,{"127.0.0.1",65534}
 		)
-	{
-	Herbs::Path path_exe(Herbs::stringloc(path_bundle));
-	path_exe>>=STR("happychords-ui.exe");
-
-	Herbs::String command=Herbs::format(STR("wine \"%0\" \"%1\"")
+	,msg_receiver(log,*this,ui_bridge,ext_host.ui_closed,controller)
+	,remote(Herbs::format(STR("wine \"%0\" \"%1\"")
 		,{
-		 Herbs::String(path_exe).begin()
+		Herbs::String(Herbs::Path(Herbs::stringloc(path_bundle))
+			>>STR("happychords-ui.exe")).begin()
 		,ui_bridge.spellstringGet(1).begin()
-		});
-
-	remote=new Herbs::Process(command);
-	
+		}))
+	{
 	Bridge::Message msg;
 	if(!ui_bridge.messageGet(msg))
 		{throw Herbs::ExceptionMissing(___FILE__,__LINE__);}
@@ -45,4 +46,6 @@ Happychords::Plugin::UiClient::UiClient(const char* path_bundle
 		strncpy((char*)msg.data.bytes,ext_host.plugin_human_id,56);
 		ui_bridge.messageSend(msg);
 		}
+	
+	msg_thread=new Herbs::Thread(msg_receiver);
 	}

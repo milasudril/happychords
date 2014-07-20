@@ -6,14 +6,17 @@ dependency[ui_client.o]
 #ifndef HAPPYCHORDS_PLUGIN_UICLIENT_H
 #define HAPPYCHORDS_PLUGIN_UICLIENT_H
 
+#include "message_receiver.h"
 #include "../bridge/connection.h"
 #include <lv2plug/feature_descriptor.h>
 #include <lv2plug/ui.h>
+#include <herbs/process/process.h>
+#include <herbs/logwriterdefault/logwriterdefault.h>
 #include <lv2/lv2plug.in/ns/extensions/ui/ui.h>
 
 namespace Herbs
 	{
-	class Process;
+	class Thread;
 	}
 
 namespace Happychords
@@ -60,8 +63,10 @@ namespace Happychords
 					,const LV2_External_UI_Host& ext_host);
 				
 				Bridge::Connection ui_bridge;
-				
-				Herbs::Process* remote;
+				Herbs::LogWriterDefault log;
+				MessageReceiver msg_receiver;
+				Herbs::Process remote;
+				Herbs::Thread* msg_thread;
 				
 			};
 		}

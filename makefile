@@ -2,16 +2,16 @@ all: __wand_targets_rel_lnx/plugin/happychords.so \
 __wand_targets_rel_lnx/plugin/happychords-ui.so \
 __wand_targets_rel_win/ui/happychords-ui.exe
 
-__wand_targets_rel_lnx/plugin/happychords.so __wand_targets_rel_lnx/plugin/happychords-ui.so: .
+__wand_targets_rel_lnx/plugin/happychords.so __wand_targets_rel_lnx/plugin/happychords-ui.so: plugin bridge
 	wand profile[release]
 
-__wand_targets_rel_win/ui/happychords-ui.exe: .
+__wand_targets_rel_win/ui/happychords-ui.exe: ui bridge
 	wine wand profile[release]
 
-__wand_targets_dbg_lnx/plugin/happychords.so __wand_targets_dbg_lnx/plugin/happychords-ui.so: .
+__wand_targets_dbg_lnx/plugin/happychords.so __wand_targets_dbg_lnx/plugin/happychords-ui.so: plugin bridge
 	wand
 
-__wand_targets_dbg_win/ui/happychords-ui.exe: .
+__wand_targets_dbg_win/ui/happychords-ui.exe: ui bridge
 	wine wand
 
 install: all

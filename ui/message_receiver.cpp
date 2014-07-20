@@ -19,7 +19,7 @@ int Happychords::Ui::MessageReceiver::run()
 		switch(msg.type)
 			{
 			case Bridge::Message::Type::TERMINATE:
-				m_dest->destroy();
+				m_dest->close();
 				return STATUS_OK;
 			case Bridge::Message::Type::WINDOWTITLE_SET:
 				{
