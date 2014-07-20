@@ -1,0 +1,4 @@
+{
+  "name": "Happychords"
+, "files": [ { "directory": ".", "filters": ["makefile","*.ttl", "*.cpp", "*.h","*.spell","*.sh","*.bat","*.dox","*.vbs","*.xml","*.html","*.css"], "recursive": 1 }]
+}

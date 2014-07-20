@@ -7,17 +7,18 @@
 
 @prefix ui: <http://lv2plug.in/ns/extensions/ui#>.
 
-<http://example.org/happychords#UI>
+<http://github.com/milasudril/happychords#UI>
     a <http://kxstudio.sf.net/ns/lv2ext/external-ui#Widget> ;
     ui:binary <happychords-ui.so> .
 
-<http://example.org/happychords>
+<http://github.com/milasudril/happychords>
 	a lv2:Plugin;
 	a lv2:InstrumentPlugin;
 	lv2:binary <happychords.so>;
 	doap:name "Happychords";
+	doap:maintainer [foaf:name "Torbjörn Rathsman"; ] ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl>;
-	ui:ui <http://example.org/happychords#UI> ;
+	ui:ui <http://github.com/milasudril/happychords#UI> ;
 
 lv2:port
 	[

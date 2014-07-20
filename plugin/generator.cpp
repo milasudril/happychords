@@ -6,7 +6,7 @@ target[name[generator.o] type[object]]
 #include "waveform.h"
 #include <herbs/include_binary/include_binary.h>
 
-INCLUDE_BINARY(g_osc_phase_init,"phase_init_data.dat");
+INCLUDE_BINARY(g_osc_phase_init,"plugin/phase_init_data.dat");
 
 #include <cstdio>
 
@@ -17,7 +17,7 @@ namespace
 		public:
 			OscillatorInit(const uint32_t* phase_init_begin
 				,const uint32_t* phase_init_end
-				,const Happychords::Waveform& waveform):
+				,const Happychords::Plugin::Waveform& waveform):
 				m_phase(phase_init_begin),m_phase_end(phase_init_end)
 				,m_waveform(waveform.data),m_n_frames(waveform.n_frames)
 				{}
@@ -40,7 +40,7 @@ namespace
 		};
 	}
 
-Happychords::Generator::Generator(const Waveform& audio_waveform):
+Happychords::Plugin::Generator::Generator(const Waveform& audio_waveform):
 	sources(11,OscillatorInit(
 		 (const uint32_t*)g_osc_phase_init_begin
 		,(const uint32_t*)g_osc_phase_init_end
@@ -52,7 +52,7 @@ Happychords::Generator::Generator(const Waveform& audio_waveform):
 	filterResonanceSet(2.0f);
 	}
 
-Vector::Vector2d<float> Happychords::Generator::operator()()
+Vector::Vector2d<float> Happychords::Plugin::Generator::operator()()
 	{
 	Vector::Vector2d<float> ret={0.0f,0.0f};
 	auto source=sources.begin();
@@ -75,7 +75,7 @@ Vector::Vector2d<float> Happychords::Generator::operator()()
 	return ret;
 	}
 
-void Happychords::Generator::play(int key,float value)
+void Happychords::Plugin::Generator::play(int key,float value)
 	{
 	key_held=key;
 	m_val=value;
@@ -86,7 +86,7 @@ void Happychords::Generator::play(int key,float value)
 	env_filter.attack();
 	}
 
-void Happychords::Generator::freqsUpdate()
+void Happychords::Plugin::Generator::freqsUpdate()
 	{
 	auto source=sources.begin();
 	int k=0;

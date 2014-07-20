@@ -1,13 +1,13 @@
 #ifdef __WAND__
-target[name[client.o] type[object]]
+target[name[dspengine.o] type[object]]
 #endif
 
-#include "client.h"
+#include "dspengine.h"
 #include "waveform.h"
 #include <herbs/include_binary/include_binary.h>
 #include <herbs/memoryin/memoryin.h>
 
-INCLUDE_BINARY(g_pattern_0,"pattern_0.mid");
+INCLUDE_BINARY(g_pattern_0,"plugin/pattern_0.mid");
 
 namespace
 	{
@@ -18,9 +18,9 @@ namespace
 				m_waveform(waveform),m_fs(f_s)
 				{}
 			
-			void operator()(Happychords::Generator* v,size_t n,size_t N) const
+			void operator()(Happychords::Plugin::Generator* v,size_t n,size_t N) const
 				{
-				new(v)Happychords::Generator({m_waveform.begin(),m_waveform.length()});
+				new(v)Happychords::Plugin::Generator({m_waveform.begin(),m_waveform.length()});
 				v->fsSet(m_fs);
 				}
 			
@@ -32,7 +32,7 @@ namespace
 	static const float lfo_period_default=12*16;
 	}
 
-Happychords::Client::Client(double _f_s,const char* _path_bundle
+Happychords::Plugin::DspEngine::DspEngine(double _f_s,const char* _path_bundle
 	,const LV2Plug::FeatureDescriptor& _features):
 	features(_features),f_s(_f_s)
 	,waveform(64)
@@ -78,7 +78,7 @@ Happychords::Client::Client(double _f_s,const char* _path_bundle
 	}
 
 
-void Happychords::Client::portConnect(uint32_t port,void* data)
+void Happychords::Plugin::DspEngine::portConnect(uint32_t port,void* data)
 	{
 	switch(port)
 		{
@@ -162,7 +162,7 @@ void Happychords::Client::portConnect(uint32_t port,void* data)
 		}
 	}
 
-void Happychords::Client::process(uint32_t n_frames)
+void Happychords::Plugin::DspEngine::process(uint32_t n_frames)
 	{
 	if(!midi_in)
 		{
@@ -224,7 +224,7 @@ void Happychords::Client::process(uint32_t n_frames)
 		}
 	}
 
-void Happychords::Client::parametersUpdate()
+void Happychords::Plugin::DspEngine::parametersUpdate()
 	{
 	auto generator=generators.begin();
 	while(generator!=generators.end())
@@ -250,7 +250,7 @@ void Happychords::Client::parametersUpdate()
 	gate.releaseSet(*gate_release,f_s);
 	}
 	
-void Happychords::Client::noteStart(int key,int velocity)
+void Happychords::Plugin::DspEngine::noteStart(int key,int velocity)
 	{
 	auto generator=generators.begin();
 	
@@ -273,7 +273,7 @@ void Happychords::Client::noteStart(int key,int velocity)
 		{generator_sel->play(key,velocity/127.0f);}
 	}
 	
-void Happychords::Client::noteStop(int key)
+void Happychords::Plugin::DspEngine::noteStop(int key)
 	{
 	auto generator=generators.begin();
 	while(generator!=generators.end())
@@ -283,7 +283,7 @@ void Happychords::Client::noteStop(int key)
 		}
 	}
 
-Vector::Vector2d<float> Happychords::Client::generatorsMix()
+Vector::Vector2d<float> Happychords::Plugin::DspEngine::generatorsMix()
 	{
 	Vector::Vector2d<float> sum={0.0f,0.0f};
 	auto generator=generators.begin();
@@ -297,14 +297,14 @@ Vector::Vector2d<float> Happychords::Client::generatorsMix()
 	return sum;
 	}
 
-void Happychords::Client::tempoUpdate()
+void Happychords::Plugin::DspEngine::tempoUpdate()
 	{
 	auto f=tempo/(10.0f * (*lfo_period) );
 	LFO.frequencySet(f/f_s);
 	gate_ctrl.tempoSet(tempo,f_s);
 	}
 
-void Happychords::Client::positionUpdate(const LV2_Atom_Object& obj)
+void Happychords::Plugin::DspEngine::positionUpdate(const LV2_Atom_Object& obj)
 	{
 // Received new transport position/speed
 	LV2_Atom* beat =nullptr;
