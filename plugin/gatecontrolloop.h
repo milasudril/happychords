@@ -8,6 +8,8 @@ dependency[gatecontrolloop.o]
 
 #include "sequence_info.h"
 
+#include <cstdio>
+
 namespace Happychords
 	{
 	namespace Plugin

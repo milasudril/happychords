@@ -254,11 +254,18 @@ void Happychords::Plugin::DspEngine::noteStart(int key,int velocity)
 	{
 	auto generator=generators.begin();
 	
+	while(generator!=generators.end())
+		{
+		if(generator->released())
+			{break;}
+		++generator;
+		}
+	if(generator==generators.end())
+		{return;}
+	
 	auto amp_min=generator->amplitude();
 	auto generator_sel=generator;
-	if(!generator_sel->released())
-		{generator_sel=nullptr;}
-		
+
 	while(generator!=generators.end())
 		{
 		auto amp=generator->amplitude();
@@ -269,8 +276,7 @@ void Happychords::Plugin::DspEngine::noteStart(int key,int velocity)
 			}
 		++generator;
 		}
-	if(generator_sel!=nullptr)
-		{generator_sel->play(key,velocity/127.0f);}
+	generator_sel->play(key,velocity/127.0f);
 	}
 	
 void Happychords::Plugin::DspEngine::noteStop(int key)
