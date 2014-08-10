@@ -21,6 +21,7 @@
 *.app
 
 private
+ui_offline
 backend/__wand_targets_dbg
 backend/__wand_targets_rel
 ui/__wand_targets_dbg

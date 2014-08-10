@@ -1,4 +1,31 @@
-{
-  "name": "Happychords"
-, "files": [ { "directory": ".", "filters": ["makefile","*.ttl", "*.cpp", "*.h","*.spell","*.sh","*.bat","*.dox","*.vbs","*.xml","*.html","*.css"], "recursive": 1 }]
-}
+	{
+	"name": "Happychords"
+	, "files":
+		[
+			{
+			"directory": ".", "filters":
+				[
+				"makefile"
+				,"*.ttl"
+				, "*.cpp"
+				, "*.h"
+				,"*.spell"
+				,"*.sh"
+				,"*.bat"
+				,"*.dox"
+				,"*.vbs"
+				,"*.xml"
+				,"*.html"
+				,"*.css"
+				]
+			, "recursive": 1
+			}
+		]
+	,"build":
+		{
+		"directory": "~/Dokument/happychords"
+		,"build": "make"
+		,"clean": "make clean"
+		,"install": "make install"
+		}
+	}

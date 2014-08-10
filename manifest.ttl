@@ -145,9 +145,19 @@ lv2:port
 	lv2:minimum -24;
 	lv2:maximum 24;
 	]
-	,[
+	,
+	[
 	a lv2:InputPort,lv2:ControlPort;
 	lv2:index 14;
+	lv2:symbol "filter_keysense";
+	lv2:name "Filter/Key-sense";
+	lv2:default 0;
+	lv2:minimum 0;
+	lv2:maximum 1;
+	]
+	,[
+	a lv2:InputPort,lv2:ControlPort;
+	lv2:index 15;
 	lv2:symbol "filter_resonance";
 	lv2:name "Filter/Resonance";
 	lv2:default 0.707;
@@ -157,7 +167,7 @@ lv2:port
 
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 15;
+	lv2:index 16;
 	lv2:symbol "choir_attack" ;
 	lv2:name "Choir/Attack";
 	lv2:default 0.0009765625 ;
@@ -166,7 +176,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 16;
+	lv2:index 17;
 	lv2:symbol "choir_decay" ;
 	lv2:name "Choir/Decay";
 	lv2:default 0.0009765625 ;
@@ -175,7 +185,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 17;
+	lv2:index 18;
 	lv2:symbol "choir_sustain" ;
 	lv2:name "Choir/Sustain";
 	lv2:default 0.5 ;
@@ -184,7 +194,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 18;
+	lv2:index 19;
 	lv2:symbol "choir_release" ;
 	lv2:name "Choir/Release";
 	lv2:default 0.0009765625 ;
@@ -194,7 +204,7 @@ lv2:port
 
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 19;
+	lv2:index 20;
 	lv2:symbol "gate_attack" ;
 	lv2:name "Gate/Attack";
 	lv2:default 0.0009765625 ;
@@ -203,7 +213,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 20;
+	lv2:index 21;
 	lv2:symbol "gate_decay" ;
 	lv2:name "Gate/Decay";
 	lv2:default 0.0009765625 ;
@@ -212,7 +222,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 21;
+	lv2:index 22;
 	lv2:symbol "gate_sustain" ;
 	lv2:name "Gate/Sustain";
 	lv2:default 1.0 ;
@@ -221,7 +231,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 22;
+	lv2:index 23;
 	lv2:symbol "gate_release" ;
 	lv2:name "Gate/Release";
 	lv2:default 0.0009765625 ;
@@ -230,7 +240,7 @@ lv2:port
 	]
 	,[
 	a lv2:InputPort,lv2:ControlPort;
-	lv2:index 23;
+	lv2:index 24;
 	lv2:symbol "gate_depth" ;
 	lv2:name "Gate/Depth";
 	lv2:default 0.8 ;

@@ -17,18 +17,18 @@ namespace
 			GeneratorInit(const Herbs::ArrayFixedsize<float>& waveform,float f_s):
 				m_waveform(waveform),m_fs(f_s)
 				{}
-			
+
 			void operator()(Happychords::Plugin::Generator* v,size_t n,size_t N) const
 				{
 				new(v)Happychords::Plugin::Generator({m_waveform.begin(),m_waveform.length()});
 				v->fsSet(m_fs);
 				}
-			
+
 		private:
 			const Herbs::ArrayFixedsize<float>& m_waveform;
 			float m_fs;
 		};
-	
+
 	static const float lfo_period_default=12*16;
 	}
 
@@ -48,10 +48,10 @@ Happychords::Plugin::DspEngine::DspEngine(double _f_s,const char* _path_bundle
 	while(sample!=waveform.end())
 		{
 		*sample=-1.0f*(1.0f -  k/63.0f) + 1.0f*k/63.0f;
-		++k; 
+		++k;
 		++sample;
 		}
-		
+
 	k=0;
 	sample=waveform_LFO.begin();
 	while(sample!=waveform_LFO.end())
@@ -60,7 +60,7 @@ Happychords::Plugin::DspEngine::DspEngine(double _f_s,const char* _path_bundle
 		++k;
 		++sample;
 		}
-	
+
 	Herbs::MemoryIn pattern_seq(g_pattern_0_begin
 		,g_pattern_0_end-g_pattern_0_begin);
 	pattern.load(pattern_seq);
@@ -91,21 +91,21 @@ void Happychords::Plugin::DspEngine::portConnect(uint32_t port,void* data)
 		case 2:
 			output_R=(float*)data;
 			break;
-		
+
 		case 3:
 			choir_detune=(const float*)data;
 			break;
 		case 4:
 			choir_suboct=(const float*)data;
 			break;
-			
+
 		case 5:
 			lfo_period=(const float*)data;
 			break;
 		case 6:
 			lfo_phase=(const float*)data;
 			break;
-			
+
 		case 7:
 			filter_cutoff=(const float*)data;
 			break;
@@ -128,37 +128,40 @@ void Happychords::Plugin::DspEngine::portConnect(uint32_t port,void* data)
 			filter_lfodepth=(const float*)data;
 			break;
 		case 14:
+			filter_keysense=(const float*)data;
+			break;
+		case 15:
 			filter_resonance=(const float*)data;
 			break;
-			
-		case 15:
+
+		case 16:
 			choir_attack=(const float*)data;
 			break;
-		case 16:
+		case 17:
 			choir_decay=(const float*)data;
 			break;
-		case 17:
+		case 18:
 			choir_sustain=(const float*)data;
 			break;
-		case 18:
+		case 19:
 			choir_release=(const float*)data;
 			break;
-			
-		case 19:
+
+		case 20:
 			gate_attack=(const float*)data;
 			break;
-		case 20:
+		case 21:
 			gate_decay=(const float*)data;
 			break;
-		case 21:
+		case 22:
 			gate_sustain=(const float*)data;
 			break;
-		case 22:
+		case 23:
 			gate_release=(const float*)data;
 			break;
-		case 23:
+		case 24:
 			gate_depth=(const float*)data;
-			break;			
+			break;
 		}
 	}
 
@@ -171,7 +174,7 @@ void Happychords::Plugin::DspEngine::process(uint32_t n_frames)
 		*/
 		return;
 		}
-	
+
 	parametersUpdate();
 
 	/* process events on the midi_in port */
@@ -204,7 +207,7 @@ void Happychords::Plugin::DspEngine::process(uint32_t n_frames)
 			}
 		else
 			{printf("I do not know what type %d is\n",ev->body.type);}
-		
+
 		ev = lv2_atom_sequence_next(ev);
 		}
 
@@ -241,6 +244,7 @@ void Happychords::Plugin::DspEngine::parametersUpdate()
 		generator->filterSustainSet(*filter_sustain);
 		generator->filterReleaseSet(*filter_release);
 		generator->filterEnvSet(*filter_env);
+		generator->filterKeysenseSet(*filter_keysense);
 		++generator;
 		}
 	tempoUpdate();
@@ -249,16 +253,23 @@ void Happychords::Plugin::DspEngine::parametersUpdate()
 	gate.sustainSet(*gate_sustain);
 	gate.releaseSet(*gate_release,f_s);
 	}
-	
+
 void Happychords::Plugin::DspEngine::noteStart(int key,int velocity)
 	{
 	auto generator=generators.begin();
-	
+
+	while(generator!=generators.end())
+		{
+		if(generator->released())
+			{break;}
+		++generator;
+		}
+	if(generator==generators.end())
+		{return;}
+
 	auto amp_min=generator->amplitude();
 	auto generator_sel=generator;
-	if(!generator_sel->released())
-		{generator_sel=nullptr;}
-		
+
 	while(generator!=generators.end())
 		{
 		auto amp=generator->amplitude();
@@ -269,10 +280,9 @@ void Happychords::Plugin::DspEngine::noteStart(int key,int velocity)
 			}
 		++generator;
 		}
-	if(generator_sel!=nullptr)
-		{generator_sel->play(key,velocity/127.0f);}
+	generator_sel->play(key,velocity/127.0f);
 	}
-	
+
 void Happychords::Plugin::DspEngine::noteStop(int key)
 	{
 	auto generator=generators.begin();
@@ -320,14 +330,14 @@ void Happychords::Plugin::DspEngine::positionUpdate(const LV2_Atom_Object& obj)
 		,features.frame(), &frame
 		,features.fps(), &fps
 		,NULL);
-	
+
 	if (bpm && bpm->type == features.Float())
 		{
 		auto temp=(LV2_Atom_Float*)bpm;
 		tempo=temp->body;
 		tempoUpdate();
 		}
-	
+
 	if(frame && frame->type == features.Long())
 		{
 		auto temp=(LV2_Atom_Long*)frame;

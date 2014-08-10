@@ -1,9 +1,0 @@
-    lv2:extensionData uiext:showInterface ;
-    lv2:requiredFeature uiext:makeResident ;
-
-
- <http://example.org/happychords/ui>
-    a uiext:GtkUI ;
-    uiext:binary <happychords-ui.so> .
-
-guiext:ui <http://example.org/happychords/ui>;
