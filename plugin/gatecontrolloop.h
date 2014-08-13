@@ -8,9 +8,6 @@ dependency[gatecontrolloop.o]
 
 #include "sequence_info.h"
 
-#include <midiseq/event.h>
-#include <cstdio>
-
 namespace Happychords
 	{
 	namespace Plugin
@@ -27,17 +24,6 @@ namespace Happychords
 					{
 					seq=seq_info;
 					positionReset();
-
-					printf("dt=%lu l=%lu\n",seq.time_division,seq.length);
-
-					auto pos_min=seq.begin;
-					while(pos_min!=seq.end)
-						{
-						printf("%llu, %llx, %x\n",pos_min->time,pos_min->type,pos_min->data.bytes[0]&0xf0);
-						++pos_min;
-						}
-
-
 					}
 
 				void positionReset()
