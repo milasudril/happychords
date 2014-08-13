@@ -4,8 +4,8 @@ target[name[gatecontrolloop.o] type[object]]
 
 #include "gatecontrolloop.h"
 #include "gate.h"
-#include <mustudio/midi_sequence.h>
-#include <mustudio/midi_event.h>
+#include <midiseq/sequence.h>
+#include <midiseq/event.h>
 
 Happychords::Plugin::GateControlLoop::GateControlLoop(Gate& gate):
 	m_gate(gate)
@@ -19,31 +19,28 @@ void Happychords::Plugin::GateControlLoop::operator()()
 	double time_scale=m_fs*60/(m_bpm*seq.time_division);
 	while(sample_pos>=time_scale*seq_pos->time && seq_pos!=seq.end)
 		{
-		switch(seq_pos->type)
+		if(seq_pos->type==(uint64_t)(-1))
 			{
-			case 0:
-				switch(seq_pos->data.bytes[0]&0xf0)
-					{
-					case 0x80:
-						m_gate.close();
-						break;
-					case 0x90:
-						m_gate.open();
-						break;
-			
-					}
-				break;
+			switch(seq_pos->data.bytes[0]&0xf0)
+				{
+				case 0x80:
+					m_gate.close();
+					break;
+				case 0x90:
+					m_gate.open();
+					break;
+				}
 			}
 		++seq_pos;
 		}
-		
+
 	++sample_pos;
 	if(seq_pos==seq.end)
 		{
 		positionReset();
 		}
 	}
-	
+
 void Happychords::Plugin::GateControlLoop::seek()
 	{
 	double time_scale=m_fs*60/(m_bpm*seq.time_division);

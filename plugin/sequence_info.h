@@ -7,13 +7,11 @@ target[name[sequence_info.h] type[include]]
 
 #include <cstddef>
 
-namespace MuStudio
+namespace MIDISeq
 	{
-	namespace MIDI
-		{
-		struct Event;
-		};
+	struct Event;
 	}
+
 
 namespace Happychords
 	{
@@ -21,8 +19,8 @@ namespace Happychords
 		{
 		struct SequenceInfo
 			{
-			const MuStudio::MIDI::Event* begin;
-			const MuStudio::MIDI::Event* end;
+			const MIDISeq::Event* begin;
+			const MIDISeq::Event* end;
 			size_t time_division;
 			size_t length;
 			};

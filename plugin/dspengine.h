@@ -10,8 +10,8 @@ dependency[dspengine.o]
 #include "gate.h"
 #include "gatecontrolloop.h"
 #include <lv2plug/feature_descriptor.h>
-#include <mustudio/midi_sequence.h>
-#include <mustudio/midi_event.h>
+#include <midiseq/sequence.h>
+#include <midiseq/event.h>
 #include <herbs/array_fixedsize/array_fixedsize.h>
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 #include <lv2/lv2plug.in/ns/ext/atom/util.h>
@@ -56,7 +56,7 @@ namespace Happychords
 				LV2Plug::FeatureDescriptor features;
 				double f_s;
 				double tempo;
-				MuStudio::MIDI::Sequence pattern;
+				MIDISeq::Sequence pattern;
 				Herbs::ArrayFixedsize<float> waveform;
 				Herbs::ArrayFixedsize<Generator> generators;
 				Herbs::ArrayFixedsize<float> waveform_LFO;
