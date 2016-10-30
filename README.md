@@ -17,6 +17,7 @@ Utilities:
  * Python3
  * Blender
  * LV2Plug Maike addon (see separate project)
+ * Inkscape
 
 
  Libraries:
@@ -24,7 +25,12 @@ Utilities:
  * LV2Plug (see separate project)
  * Gtk+-2.0 + dependencies
 
+
 Compiling
 ---------
-
 Just run maike. It may take a while to bake the sprites depending on your computer.
+
+Installing
+----------
+
+Adapt  install.sh for your needs, and run it.
