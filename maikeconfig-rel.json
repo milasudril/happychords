@@ -31,7 +31,7 @@
                     ],
                     "name":"g++"
                 },
-                "cflags_extra":[],
+                "cflags_extra":["-fast-math","march=native"],
                 "cflags_format":"-^",
                 "cxxversion_max":-1,
                 "cxxversion_min":201402,
