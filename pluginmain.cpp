@@ -32,7 +32,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	public:
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
-			,m_fs(fs)
+			,m_fs(fs),voice_adsr(fs,1e-3f,1e-1f,0.5f,1e-1)
 			{}
 
 		void process(size_t n_frames) noexcept;
@@ -40,9 +40,12 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	private:
 		LV2Plug::FeatureDescriptor m_features;
 		double m_fs;
+		Adsr::Params voice_adsr;
 		ArrayStatic<int8_t,128> keys;
-		ArrayStatic<Voice<waveform.size()>,16> voices;
-		ArrayStatic<ArrayStatic<float,64>,4> bufftemp;
+		ArrayStatic<Voice<waveform.size()>,8> voices;
+		ArrayStatic<float,64> buffer_in;
+		ArrayStatic<ArrayStatic<Framepair,64>,3> bufftemp;
+
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;
 		void voiceActivate(int8_t key,float amplitude) noexcept;
@@ -67,7 +70,7 @@ void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 			voice_min=k;
 			}
 		}
-	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude);
+	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude,voice_adsr,key);
 	keys[key]=voice_min;
 	}
 
@@ -91,7 +94,7 @@ void Engine::processEvents()noexcept
 					break;
 
 				case LV2_MIDI_MSG_NOTE_OFF:
-					voices[ keys[ msg[1] ] ].stop();
+					voices[ keys[ msg[1] ] ].stop(msg[1]);
 					break;
 
 				default:
@@ -100,7 +103,7 @@ void Engine::processEvents()noexcept
 			}
 		ev = lv2_atom_sequence_next(ev);
 		}
-}
+	}
 
 static inline bool make_bool(float value)
 	{return value>0.0f;}
@@ -111,21 +114,31 @@ void Engine::generate(size_t n_frames) noexcept
 	auto buffer_r=portmap().get<Ports::OUTPUT_R>();
 	auto detune=portmap().get<Ports::VOICE_DETUNE>();
 	auto suboct=make_bool( portmap().get<Ports::VOICE_SUBOCT>() );
+	voice_adsr=Adsr::Params(m_fs
+		,portmap().get<Ports::MAIN_ATTACK>()
+		,portmap().get<Ports::MAIN_DECAY>()
+		,portmap().get<Ports::MAIN_SUSTAIN>()
+		,portmap().get<Ports::MAIN_RELEASE>());
 
-	memset(buffer_l,0,sizeof(*buffer_l)*n_frames);
-	memset(buffer_r,0,sizeof(*buffer_l)*n_frames);
 
+	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
 		{
 		auto n=std::min(n_frames,bufftemp[0].size());
 		for(size_t k=0;k<voices.size();++k)
 			{
-			if(voices[k].amplitude()>1e-4f)
+			if(voices[k].amplitude()>1e-3f || voices[k].started())
 				{
+				memset(bufftemp[0].begin(),0,sizeof(bufftemp)/bufftemp.size());
 				voices[k].generate(waveform
-					,detune,suboct,bufftemp[0].begin(),buffer_l,buffer_r,n);
+					,detune,suboct,buffer_in.begin(),bufftemp[0].begin(),n);
+				voices[k].modulate(bufftemp[0].begin(),voice_adsr,bufftemp[1].begin(),n);
+				addToMix(bufftemp[1].begin(),bufftemp[2].begin(),n);
 				}
 			}
+		
+
+		demux(bufftemp[2].begin(),buffer_l,buffer_r,n);
 
 
 		n_frames-=n;

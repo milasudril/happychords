@@ -61,13 +61,13 @@
 			 "name":"Sustain","type":"control","direction":"in"
 			,"minimum":0.0
 			,"maximum":1.0
-			,"default":0.5
+			,"default":0.75
 			,"prefix":"Filter"
 			}
 			,{
 			 "name":"Release","type":"control","direction":"in"
-			,"minimum":0.0
-			,"maximum":1.0
+			,"minimum":0.001
+			,"maximum":2.0
 			,"default":0.5
 			,"prefix":"Filter"
 			}
@@ -124,14 +124,14 @@
 			 "name":"Sustain","type":"control","direction":"in"
 			,"minimum":0.0
 			,"maximum":1.0
-			,"default":0.5
+			,"default":0.75
 			,"prefix":"Main"
 			}
 			,{
 			 "name":"Release","type":"control","direction":"in"
-			,"minimum":0.0
-			,"maximum":1.0
-			,"default":0.5
+			,"minimum":0.001
+			,"maximum":2.0
+			,"default":0.25
 			,"prefix":"Main"
 			}
 			,{
@@ -152,14 +152,14 @@
 			 "name":"Sustain","type":"control","direction":"in"
 			,"minimum":0.0
 			,"maximum":1.0
-			,"default":1.0
+			,"default":0.75
 			,"prefix":"Gate"
 			}
 			,{
 			 "name":"Release","type":"control","direction":"in"
-			,"minimum":0.0
-			,"maximum":1.0
-			,"default":0.5
+			,"minimum":0.001
+			,"maximum":2.0
+			,"default":0.001
 			,"prefix":"Gate"
 			}
 			,{

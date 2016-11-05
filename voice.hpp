@@ -5,6 +5,7 @@
 
 #include "functiongenerator.hpp"
 #include "stereomixer.hpp"
+#include "adsr.hpp"
 #include <cmath>
 #include <random>
 
@@ -14,7 +15,7 @@ namespace Happychords
 	class PRIVATE Voice
 		{
 		public:
-			Voice():m_amplitude(0),m_f(0)
+			Voice():m_amplitude(0.0f,0.0f,0.0f,0.0f),m_f(0),m_gain(0),m_key(-1)
 				{
 				std::random_device rd;
 				std::uniform_real_distribution<double> U(0,N);
@@ -24,39 +25,55 @@ namespace Happychords
 
 			void generate(const ArrayStatic<float,N>& waveform
 				,double detune,bool suboct
-				,float* buffer_temp,float* buffer_left,float* buffer_right,size_t n);
+				,float* buffer_temp,Framepair* stereo_out,size_t n) noexcept;
+
+			void modulate(const Framepair* buffer_in
+				,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept;
 
 			float amplitude() const noexcept
-				{return m_amplitude;}
+				{return m_amplitude.left<0>();}
 
-			void start(float f,float a) noexcept
+			void start(float f,float a,Adsr::Params adsr,int8_t key) noexcept
 				{
 				m_f=f;
-				m_amplitude=a;
+				m_gain=a;
+				m_modulator.attack();
+				auto a_1=m_modulator.stateUpdate(adsr,0.0f);
+				m_amplitude=Framepair{0.0f,0.0f,a_1,a_1};
+				m_key=key;
 				}
 
-			void stop() noexcept
-				{m_amplitude=0.0f;}
+			void stop(int8_t key) noexcept
+				{
+				if(key==m_key)
+					{m_modulator.release();}
+				}
+
+			bool started() const noexcept
+				{return m_modulator.started();}
 
 		private:
-			float m_amplitude;
-			float m_f;
 			ArrayStatic<FunctionGenerator<float,N>,11> m_generators;
+			Framepair m_amplitude;
+			float m_f;
+			float m_gain;
+			Adsr m_modulator;
+			int8_t m_key;
 		};
 
 	template<size_t N>
 	void Voice<N>::generate(const ArrayStatic<float,N>& waveform
 		,double detune,bool suboct
-		,float* buffer_temp,float* buffer_left,float* buffer_right,size_t n)
+		,float* buffer_temp,Framepair* stereo_out,size_t n) noexcept
 		{
 		static_assert(m_generators.size()!=0,"No generators?");
 
 		auto d_xi=1.0/(m_generators.size() - 1);
 		auto df=std::exp2(detune*d_xi/12.0);
-		auto f_0=exp2(-0.5*detune/12.0);
+		auto f_0=std::exp2(-0.5*detune/12.0);
 		auto f_base=m_f;
-		auto a=m_amplitude;
-		auto gain=1.0f/m_generators.size();
+		auto a=m_gain;
+		auto gain=2.0f/m_generators.size();
 		f_base*=f_0;
 
 		if(suboct)
@@ -65,7 +82,7 @@ namespace Happychords
 				{
 				m_generators[k].generate(k%2?0.5f*f_base:f_base,a,waveform,buffer_temp,n);
 				f_base*=df;
-				addToMix(buffer_temp,gain,k*d_xi,buffer_left,buffer_right,n);
+				addToMix(buffer_temp,gain,k*d_xi,stereo_out,n);
 				}
 			}
 		else
@@ -74,9 +91,30 @@ namespace Happychords
 				{
 				m_generators[k].generate(f_base,a,waveform,buffer_temp,n);
 				f_base*=df;
-				addToMix(buffer_temp,gain,k*d_xi,buffer_left,buffer_right,n);
+				addToMix(buffer_temp,gain,k*d_xi,stereo_out,n);
 				}
 			}
+		}
+
+	template<size_t N>
+	void Voice<N>::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept
+		{
+		auto mod=m_modulator;
+		auto amplitude=m_amplitude;
+		while(n!=0)
+			{
+			*buffer_out=amplitude*(*buffer_in);
+
+			++buffer_out;
+			++buffer_in;
+
+			auto a_1=mod.stateUpdate(adsr,amplitude.left<1>());
+			auto a_2=mod.stateUpdate(adsr,a_1);
+			amplitude=Framepair{a_1,a_1,a_2,a_2};
+			n-=2;
+			}
+		m_amplitude=amplitude;
+		m_modulator=mod;
 		}
 	}
 
