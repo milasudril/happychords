@@ -80,7 +80,8 @@ void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 			voice_min=k;
 			}
 		}
-	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude,voice_adsr,key);
+	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude,voice_adsr
+		,portmap().get<Ports::FILTER_KEYB>(),key);
 	keys[key]=voice_min;
 	}
 
@@ -118,6 +119,18 @@ void Engine::processEvents()noexcept
 static inline bool make_bool(float value)
 	{return value>0.0f;}
 
+static Filter::Params filterSetup(float filter_base,float keytrack,float Q,double dt)
+	{
+	Filter::Params filter;
+	filter.dt()=dt;
+	filter.Q()=Q;
+	auto omega_c=2.0f*std::acos(-1.0f)
+		*440.0f*std::exp2((filter_base - (1.0f - keytrack)*69.0f)/12.0f);
+	auto freq_factor=2.0f*Q/std::sqrt(4.0f*Q*Q - 1.0f);
+	filter.omega_0()=freq_factor*omega_c;
+	return filter;
+	}
+
 void Engine::generate(size_t n_frames) noexcept
 	{
 	auto buffer_l=portmap().get<Ports::OUTPUT_L>();
@@ -130,10 +143,10 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::MAIN_SUSTAIN>()
 		,portmap().get<Ports::MAIN_RELEASE>());
 
-	Filter::Params filter;
-	filter.dt()=1.0/m_fs;
-	filter.Q()=portmap().get<Ports::FILTER_RES>();
-	filter.omega_0()=2.0f*std::acos(-1.0f)*frequencyGet(portmap().get<Ports::FILTER_BASE>());
+	auto filter=filterSetup(portmap().get<Ports::FILTER_BASE>()
+		,portmap().get<Ports::FILTER_KEYB>()
+		,portmap().get<Ports::FILTER_RES>()
+		,1.0/m_fs);
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)

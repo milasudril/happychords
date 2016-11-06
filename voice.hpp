@@ -16,7 +16,8 @@ namespace Happychords
 	class PRIVATE Voice
 		{
 		public:
-			Voice():m_amplitude(0.0f,0.0f,0.0f,0.0f),m_f(0),m_gain(0),m_f_0(1.0f),m_key(-1)
+			Voice():m_amplitude(0.0f,0.0f,0.0f,0.0f),m_f(0),m_gain(0),m_f_0(1.0f)
+				,m_keytrack(1.0f),m_key(-1)
 				{
 				std::random_device rd;
 				std::uniform_real_distribution<double> U(0,N);
@@ -37,7 +38,8 @@ namespace Happychords
 			float amplitude() const noexcept
 				{return m_amplitude.left<0>();}
 
-			void start(float f,float a,Adsr::Params adsr,int8_t key) noexcept
+			void start(float f,float a,Adsr::Params adsr,float keytrack
+				,int8_t key) noexcept
 				{
 				m_f=f;
 				m_gain=a;
@@ -45,6 +47,7 @@ namespace Happychords
 				auto a_1=m_modulator.stateUpdate(adsr,0.0f);
 				m_amplitude=Framepair{0.0f,0.0f,a_1,a_1};
 				m_key=key;
+				m_keytrack=std::exp2((key-69)*keytrack/12.0f);
 				}
 
 			void stop(int8_t key) noexcept
@@ -64,6 +67,7 @@ namespace Happychords
 			Adsr m_modulator;
 			Filter m_filter;
 			float m_f_0;
+			float m_keytrack;
 			int8_t m_key;
 		};
 
@@ -129,10 +133,11 @@ namespace Happychords
 		{
         auto filter=m_filter;
         auto f0=m_f_0;
+		auto keytrack=m_keytrack;
         while(n!=0)
         	{
 			auto p=filter_params;
-            p.omega_0()*=f0;
+            p.omega_0()*=f0*keytrack;
             auto a=filter.stateUpdate(p,{buffer_in->left<0>(),buffer_in->right<0>()});
             auto b=filter.stateUpdate(p,{buffer_in->left<1>(),buffer_in->right<1>()});
             *buffer_out=Framepair{a.first,a.second,b.first,b.second};
