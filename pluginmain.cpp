@@ -9,7 +9,6 @@
 //@		}]
 //@	}
 
-
 #include <maike/targetinclude.hpp>
 #include MAIKE_TARGET(plugindescriptor.hpp)
 #include "blob.hpp"
@@ -24,7 +23,6 @@
 
 using namespace Happychords;
 
-
 static constexpr auto waveform=Happychords::sawtooth();
 
 class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
@@ -36,6 +34,18 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 			{}
 
 		void process(size_t n_frames) noexcept;
+
+		static void* operator new(size_t size)
+			{
+			void* ret;
+			posix_memalign(&ret,64,size);
+			return ret;
+			}
+
+		static void operator delete(void* pointer)
+			{
+			free(pointer);
+			}
 
 	private:
 		LV2Plug::FeatureDescriptor m_features;
@@ -120,6 +130,10 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::MAIN_SUSTAIN>()
 		,portmap().get<Ports::MAIN_RELEASE>());
 
+	Filter::Params filter;
+	filter.dt()=1.0/m_fs;
+	filter.Q()=portmap().get<Ports::FILTER_RES>();
+	filter.omega_0()=2.0f*std::acos(-1.0f)*frequencyGet(portmap().get<Ports::FILTER_BASE>());
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
@@ -132,8 +146,10 @@ void Engine::generate(size_t n_frames) noexcept
 				memset(bufftemp[0].begin(),0,sizeof(bufftemp)/bufftemp.size());
 				voices[k].generate(waveform
 					,detune,suboct,buffer_in.begin(),bufftemp[0].begin(),n);
-				voices[k].modulate(bufftemp[0].begin(),voice_adsr,bufftemp[1].begin(),n);
-				addToMix(bufftemp[1].begin(),bufftemp[2].begin(),n);
+				voices[k].filterApply(bufftemp[0].begin(),filter,bufftemp[1].begin(),n);
+				voices[k].modulate(bufftemp[1].begin(),voice_adsr,bufftemp[0].begin(),n);
+				
+				addToMix(bufftemp[0].begin(),bufftemp[2].begin(),n);
 				}
 			}
 		

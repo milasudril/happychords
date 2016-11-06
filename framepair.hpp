@@ -102,6 +102,6 @@ namespace Happychords
 	constexpr inline Framepair operator/(Framepair b,float c) noexcept
 		{return b/=c;}
 
-	};
+	}
 
 #endif
