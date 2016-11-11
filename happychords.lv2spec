@@ -133,6 +133,13 @@
 			,"maximum":2.0
 			,"default":0.25
 			,"prefix":"Main"
+			},
+			{
+			 "name":"Gain","type":"control","direction":"in"
+			,"minimum":0
+			,"maximum":2
+			,"default":1
+			,"prefix":"Main"
 			}
 			,{
 			 "name":"Attack","type":"control","direction":"in"

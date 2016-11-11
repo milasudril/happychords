@@ -109,12 +109,15 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 					//	,m_foo(m_res_box.insertModeSet(Box::InsertMode::FILL),"Decoration/Graph")
 						,m_foo(m_res_box.insertModeSet(Box::InsertMode::FILL),1)
 				,m_main(m_controls.paddingSet(8),0)
-					,m_main_env(m_main.paddingSet(8),"Envelope")
-						,m_main_env_box(m_main_env.paddingSet(4),1)
-							,m_main_attack(m_main_env_box.insertModeSet(Box::InsertMode::EXPAND),*this)
-							,m_main_decay(m_main_env_box,*this)
-							,m_main_sustain(m_main_env_box,*this)
-							,m_main_release(m_main_env_box,*this)
+					,m_main_box(m_main.paddingSet(8),1)
+						,m_main_env(m_main_box.paddingSet(4),"Envelope")
+							,m_main_env_box(m_main_env.paddingSet(4),1)
+								,m_main_attack(m_main_env_box.insertModeSet(Box::InsertMode::EXPAND),*this)
+								,m_main_decay(m_main_env_box,*this)
+								,m_main_sustain(m_main_env_box,*this)
+								,m_main_release(m_main_env_box,*this)
+						,m_main_gain_box(m_main_box,0)
+							,m_main_gain(m_main_gain_box.paddingSet(4),*this)
 					,m_gate(m_main,"Gate")
 						,m_gate_box(m_gate.paddingSet(4))
 							,m_gate_row(m_gate_box.paddingSet(0),1)
@@ -206,6 +209,10 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 			m_main_release.captionColorSet(COLOR_TEXT);
 			m_main_release.entryBackgroundSet(COLOR_ENTRY);
 			m_main_release.entryForegroundSet(COLOR_TEXT);
+			m_main_gain.colorSet(COLOR_KNOB);
+			m_main_gain.captionColorSet(COLOR_TEXT);
+			m_main_gain.entryBackgroundSet(COLOR_ENTRY);
+			m_main_gain.entryForegroundSet(COLOR_TEXT);
 			m_gate_attack.colorSet(COLOR_KNOB);
 			m_gate_attack.captionColorSet(COLOR_TEXT);
 			m_gate_attack.entryBackgroundSet(COLOR_ENTRY);
@@ -285,12 +292,15 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 					Knob< Port<Ports::FILTER_RES>,UIGtk> m_filter_res;
 					Box m_foo;
 			Box m_main;
-				Panel m_main_env;
-					Box m_main_env_box;
-						Knob< Port<Ports::MAIN_ATTACK>,UIGtk> m_main_attack;
-						Knob< Port<Ports::MAIN_DECAY>,UIGtk> m_main_decay;
-						Knob< Port<Ports::MAIN_SUSTAIN>,UIGtk> m_main_sustain;
-						Knob< Port<Ports::MAIN_RELEASE>,UIGtk> m_main_release;
+				Box m_main_box;
+					Panel m_main_env;
+						Box m_main_env_box;
+							Knob< Port<Ports::MAIN_ATTACK>,UIGtk> m_main_attack;
+							Knob< Port<Ports::MAIN_DECAY>,UIGtk> m_main_decay;
+							Knob< Port<Ports::MAIN_SUSTAIN>,UIGtk> m_main_sustain;
+							Knob< Port<Ports::MAIN_RELEASE>,UIGtk> m_main_release;
+					Box m_main_gain_box;
+						Knob< Port<Ports::MAIN_GAIN>,UIGtk > m_main_gain;
 				Panel m_gate;
 					Box m_gate_box;
 						Box m_gate_row;
@@ -321,3 +331,4 @@ const LV2UI_Descriptor& LV2Plug::mainUI()
 	{
 	return LV2Plug::descriptorUiGet<UIGtk>();
 	}
+ 

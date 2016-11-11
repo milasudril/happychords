@@ -31,7 +31,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	public:
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
-			,m_fs(fs),voice_adsr(fs,1e-3f,1e-1f,0.5f,1e-1)
+			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0),n_frames_prev(0)
+			,voice_adsr(fs,1e-3f,1e-1f,0.5f,1e-1)
 			{}
 
 		void process(size_t n_frames) noexcept;
@@ -52,6 +53,11 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	private:
 		LV2Plug::FeatureDescriptor m_features;
 		double m_fs;
+		float m_tempo;
+		float m_speed;
+		int64_t m_position;
+		int64_t n_frames_prev;
+		
 		Adsr::Params voice_adsr;
 		ArrayStatic<int8_t,128> keys;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
@@ -63,6 +69,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;
 		void voiceActivate(int8_t key,float amplitude) noexcept;
+		void positionUpdate(const LV2_Atom_Object& obj) noexcept;
 	};
 
 static float frequencyGet(float key) noexcept
@@ -89,7 +96,7 @@ void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 	keys[key]=voice_min;
 	}
 
-void Engine::processEvents()noexcept
+void Engine::processEvents() noexcept
 	{
 	auto midi_in=portmap().get<Ports::MIDI_IN>();
 	if(midi_in==nullptr)
@@ -111,12 +118,19 @@ void Engine::processEvents()noexcept
 				case LV2_MIDI_MSG_NOTE_OFF:
 					voices[ keys[ msg[1] ] ].stop(msg[1]);
 					break;
-
 				default:
 					break;
 				}
 			}
-		ev = lv2_atom_sequence_next(ev);
+		else
+		if(ev->body.type==m_features.AtomBlank()
+			|| ev->body.type==m_features.AtomObject())
+			{
+			auto obj=reinterpret_cast<const LV2_Atom_Object*>(&ev->body);
+			if(obj->body.otype==m_features.position())
+				{positionUpdate(*obj);}
+			}
+		ev=lv2_atom_sequence_next(ev);
 		}
 	}
 
@@ -133,6 +147,59 @@ static Filter::Params filterSetup(float filter_base,float keytrack,float Q,doubl
 	auto freq_factor=Q<1.0f/sqrt(2.0f)?sqrt(2.0f):2.0f*Q/std::sqrt(4.0f*Q*Q - 1.0f);
 	filter.omega_0()=freq_factor*omega_c;
 	return filter;
+	}
+
+void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
+	{
+	LV2_Atom* beat=nullptr;
+	LV2_Atom* bpm=nullptr;
+	LV2_Atom* speed=nullptr;
+	LV2_Atom* fps=nullptr;
+	LV2_Atom* frame=nullptr;
+
+	lv2_atom_object_get(&obj,m_features.Beat()
+		,&beat,m_features.beatsPerMinute(),&bpm,m_features.speed(),&speed
+		,m_features.frame(),&frame,m_features.fps(),&fps,NULL);
+	
+	auto speed_val=1.0f;
+	if(speed && speed->type==m_features.Float())
+		{
+		auto temp=reinterpret_cast<const LV2_Atom_Float*>(speed);
+		static_assert(std::is_same<decltype(temp->body),decltype(m_tempo)>::value
+			,"Speed has wrong type");
+		speed_val=temp->body;
+		}
+
+	if(bpm && bpm->type==m_features.Float())
+		{
+		auto temp=reinterpret_cast<const LV2_Atom_Float*>(bpm);
+		auto tempo=temp->body;
+		static_assert(std::is_same<decltype(tempo),decltype(m_tempo)>::value
+			,"Tempo has wrong type");
+		if(tempo!=m_tempo)
+			{
+			printf("Tempo set %.7g\n",temp->body);
+			m_tempo=tempo;
+			}
+		}
+
+	if(frame && frame->type==m_features.Long())
+		{
+		auto temp=reinterpret_cast<const LV2_Atom_Long*>(frame);
+		auto pos_new=temp->body;
+	//	Detect when to reposition LFO and gate cursors. Only update cursors
+	//	when
+	//		1. The head has moved backwards (This cannot be regular playback)
+	//		2. Playback is stopped, and the position is updated
+	//		3. The head has moved an unexpected distance into the future
+		if(pos_new < m_position || (m_speed!=1.0f && pos_new!=m_position)
+			|| pos_new - m_position > 64*n_frames_prev)
+			{
+			printf("Position set %lld->%lld\n",m_position,pos_new);
+			}
+		m_position=pos_new;
+		}
+	m_speed=speed_val;
 	}
 
 void Engine::generate(size_t n_frames) noexcept
@@ -152,6 +219,7 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::FILTER_RES>()
 		,1.0/m_fs);
 	auto filter_lfo=portmap().get<Ports::FILTER_LFO>()/12.0f;
+	auto main_gain=portmap().get<Ports::MAIN_GAIN>();
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
@@ -176,7 +244,10 @@ void Engine::generate(size_t n_frames) noexcept
 				}
 			}
 		
-
+		std::transform(bufftemp[2].begin(),bufftemp[2].begin() + n/2,bufftemp[2].begin()
+			,[main_gain](Framepair x)
+				{return main_gain*x;}
+			);
 		demux(bufftemp[2].begin(),buffer_l,buffer_r,n);
 
 
@@ -190,6 +261,7 @@ void Engine::process(size_t n_frames) noexcept
 	{
 	processEvents();
 	generate(n_frames);
+	n_frames_prev=n_frames;
 	}
 
 
