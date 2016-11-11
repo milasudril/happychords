@@ -45,6 +45,7 @@ namespace Happychords
 				m_gain=a;
 				m_modulator.attack();
 				auto a_1=m_modulator.stateUpdate(adsr,0.0f);
+				m_filter.stateReset();
 				m_amplitude=Framepair{0.0f,0.0f,a_1,a_1};
 				m_key=key;
 				m_keytrack=std::exp2((key-69)*keytrack/12.0f);

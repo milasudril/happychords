@@ -69,6 +69,12 @@ namespace Happychords
                 return {r[0],r[2]};
             	}
 
+			constexpr void stateReset() noexcept
+				{
+				m_out_old=vec4<double>{0.0,0.0,0.0,0.0};
+				m_in_old=vec4<double>{0.0,0.0,0.0,0.0};
+				}
+
 		private:
 			vec4<double> m_out_old;
           	vec4<double> m_in_old;

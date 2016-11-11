@@ -37,7 +37,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		static void* operator new(size_t size)
 			{
 			void* ret;
-			posix_memalign(&ret,64,size);
+			if(posix_memalign(&ret,64,size))
+				{throw "Bad malloc";}
 			return ret;
 			}
 
@@ -53,7 +54,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		ArrayStatic<int8_t,128> keys;
 		ArrayStatic<Voice<waveform.size()>,8> voices;
 		ArrayStatic<float,64> buffer_in;
-		ArrayStatic<ArrayStatic<Framepair,64>,3> bufftemp;
+		ArrayStatic<ArrayStatic<Framepair,32>,3> bufftemp;
 
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;
@@ -150,7 +151,7 @@ void Engine::generate(size_t n_frames) noexcept
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
 		{
-		auto n=std::min(n_frames,bufftemp[0].size());
+		auto n=std::min(n_frames,buffer_in.size());
 		for(size_t k=0;k<voices.size();++k)
 			{
 			if(voices[k].amplitude()>1e-3f || voices[k].started())
