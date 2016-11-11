@@ -5,7 +5,7 @@
 #ifndef HAPPYCHORDS_FUNCTIONGENERATOR_HPP
 #define HAPPYCHORDS_FUNCTIONGENERATOR_HPP
 
-#include "arraystatic.hpp"
+#include "../common/arraystatic.hpp"
 #include <cassert>
 
 namespace Happychords

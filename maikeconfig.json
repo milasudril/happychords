@@ -4,9 +4,11 @@
         "paths_reject":[
             "..",
             ".",
-            "__targets"
+			".git",
+            "__targets",
+			"__targets_rel"
         ],
-        "recursive":0
+        "recursive":1
     },
     "source_files":[
         "."
@@ -21,8 +23,10 @@
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
+                        "{iquote}",
                         "{includedir}",
                         "-DMAIKE_TARGET_DIRECTORY={target_directory}",
+                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
                         "-o",
                         "{target}",
                         "{source}",
@@ -42,8 +46,10 @@
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
+                        "{iquote}",
                         "{includedir}",
                         "-DMAIKE_TARGET_DIRECTORY={target_directory}",
+                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
                         "-shared",
                         "-o",
                         "{target}",
@@ -56,6 +62,10 @@
                 "includedir":[],
                 "includedir_format":"-I^",
                 "includedir_noscan":[],
+                "iquote":[
+                    "."
+                ],
+                "iquote_format":"-iquote^",
                 "libcompile":{
                     "args":[
                         "rcs",
@@ -76,8 +86,10 @@
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
+                        "{iquote}",
                         "{includedir}",
                         "-DMAIKE_TARGET_DIRECTORY={target_directory}",
+                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
                         "-o",
                         "{target}",
                         "{source}"

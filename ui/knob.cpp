@@ -13,7 +13,7 @@
 //@	}
 
 #include "knob.hpp"
-#include "blob.hpp"
+#include "../common/blob.hpp"
 #include "imageresource.hpp"
 #include "cairocontext.hpp"
 #include "container.hpp"

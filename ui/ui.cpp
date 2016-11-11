@@ -1,7 +1,7 @@
 //@	{
 //@	"targets":
 //@		[{
-//@		 "name":"happychords2-gtk.so","type":"lib_dynamic"
+//@		 "name":"../happychords2-gtk.so","type":"lib_dynamic"
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug_ui","rel":"external"}
@@ -13,8 +13,8 @@
 
 #include "container.hpp"
 #include <maike/targetinclude.hpp>
-#include MAIKE_TARGET(plugindescriptor.hpp)
-#include "blob.hpp"
+#include MAIKE_TARGET(../plugindescriptor.hpp)
+#include "../common/blob.hpp"
 #include "knob.hpp"
 #include "switch.hpp"
 #include "box.hpp"

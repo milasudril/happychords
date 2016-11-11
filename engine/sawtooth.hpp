@@ -3,7 +3,7 @@
 #ifndef HAPPYCHORDS_SAWTOOTH_HPP
 #define HAPPYCHORDS_SAWtOOTH_HPP
 
-#include "arraystatic.hpp"
+#include "../common/arraystatic.hpp"
 #include <cmath>
 
 namespace Happychords

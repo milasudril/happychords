@@ -24,28 +24,32 @@ def newer(file_a,file_b):
 	return 0
 
 try:
-	target_dir=sys.argv[1];
+	target_dir=sys.argv[1]
+	in_dir=sys.argv[2]
 
-	if (newer(target_dir+'/background.png','star.svg') 
-		and newer(target_dir+'/background.png',sys.argv[0])
-		and newer(target_dir+'/background.png','genpattern.m')):
+	if (newer(target_dir+'/'+in_dir+'/background.png',in_dir+'/star.svg') 
+		and newer(target_dir+'/'+in_dir+'/background.png',sys.argv[0])
+		and newer(target_dir+'/'+in_dir+'/background.png',in_dir+'/genpattern.m')):
 		exit(0)
-	subprocess.run(['inkscape','--export-png='+target_dir+'/background.png','star.svg']\
+	print('Baking background image');
+
+	subprocess.run(['inkscape','--export-png='+target_dir+'/'+in_dir+'/background.png'
+		,in_dir+'/star.svg']\
 		,stdout=subprocess.DEVNULL)
 
-	script="""data=imread('""" +target_dir+'/background.png'+"""');
+	script="""addpath('"""+in_dir+"""');
+filename='""" +target_dir+'/'+in_dir+'/background.png'+"""';
+warning('off','Octave:GraphicsMagic-Quantum-Depth');
+data=imread(filename);
 mask=data(:,:,1);
 pkg load image;
 pattern=genpattern(mask,64,[1200 1920],225);
 noise=rand(size(pattern)).*(pattern < 0.125);
 noise=4*(noise - 5/8)/3;
-imwrite(pattern + noise.*(noise>0),'""" +target_dir+'/background.png'+ """');
+imwrite(pattern + noise.*(noise>0),filename);
 """
 	p=subprocess.Popen(['octave-cli'],stdin=subprocess.PIPE)
 	p.communicate(script.encode('utf8'))
-
-#	subprocess.run(['convert','-size','1020x1020','pattern:checkerboard' \
-#		,target_dir + '/background.png']);
 except Exception:
-    write_error('%s: error: %s\n'%(sys.argv[0],sys.exc_info()[1]))
-    sys.exit(-1)
+	write_error('%s:%d: error: %s\n'%(sys.argv[0],sys.exc_info()[2].tb_lineno,sys.exc_info()[1]))
+	sys.exit(-1)

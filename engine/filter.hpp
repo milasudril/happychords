@@ -41,7 +41,7 @@ namespace Happychords
                             float omega_0;
                             float Q;
                             } content;
-                        vec4<double> vec;
+                        vec4<float> vec;
                         } m_data;
 				};
 

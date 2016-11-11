@@ -1,7 +1,7 @@
 //@	{
 //@	"targets":
 //@		[{
-//@		 "name":"happychords2.so","type":"lib_dynamic"
+//@		 "name":"../happychords2.so","type":"lib_dynamic"
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug","rel":"external"}
@@ -10,8 +10,7 @@
 //@	}
 
 #include <maike/targetinclude.hpp>
-#include MAIKE_TARGET(plugindescriptor.hpp)
-#include "blob.hpp"
+#include MAIKE_TARGET(../plugindescriptor.hpp)
 #include "voice.hpp"
 #include "sawtooth.hpp"
 #include <lv2plug/lv2plug.hpp>
@@ -126,7 +125,7 @@ static Filter::Params filterSetup(float filter_base,float keytrack,float Q,doubl
 	filter.Q()=Q;
 	auto omega_c=2.0f*std::acos(-1.0f)
 		*440.0f*std::exp2((filter_base - (1.0f - keytrack)*69.0f)/12.0f);
-	auto freq_factor=2.0f*Q/std::sqrt(4.0f*Q*Q - 1.0f);
+	auto freq_factor=Q<1.0f/sqrt(2.0f)?sqrt(2.0f):2.0f*Q/std::sqrt(4.0f*Q*Q - 1.0f);
 	filter.omega_0()=freq_factor*omega_c;
 	return filter;
 	}

@@ -101,7 +101,7 @@
 			}
 			,{
 			 "name":"Res","type":"control","direction":"in"
-			,"minimum":0.51
+			,"minimum":0.5
 			,"maximum":16.0
 			,"default":0.707
 			,"prefix":"Filter"
