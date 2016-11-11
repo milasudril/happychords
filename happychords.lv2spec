@@ -80,9 +80,9 @@
 			}
 			,{
 			 "name":"LFO","type":"control","direction":"in"
-			,"minimum":0.0
-			,"maximum":1.0
-			,"default":0.5
+			,"minimum":0
+			,"maximum":24.0
+			,"default":0.0
 			,"prefix":"Filter"
 			}
 			,{

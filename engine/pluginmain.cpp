@@ -13,6 +13,7 @@
 #include MAIKE_TARGET(../plugindescriptor.hpp)
 #include "voice.hpp"
 #include "sawtooth.hpp"
+#include "sine.hpp"
 #include <lv2plug/lv2plug.hpp>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
 #include <cmath>
@@ -23,6 +24,7 @@
 using namespace Happychords;
 
 static constexpr auto waveform=Happychords::sawtooth();
+static constexpr auto waveform_lfo=Happychords::sine();
 
 class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	{
@@ -52,6 +54,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		double m_fs;
 		Adsr::Params voice_adsr;
 		ArrayStatic<int8_t,128> keys;
+		FunctionGenerator<float,waveform_lfo.size()> LFO;
+		ArrayStatic<float,64> buffer_lfo;
 		ArrayStatic<Voice<waveform.size()>,8> voices;
 		ArrayStatic<float,64> buffer_in;
 		ArrayStatic<ArrayStatic<Framepair,32>,3> bufftemp;
@@ -147,11 +151,17 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::FILTER_KEYB>()
 		,portmap().get<Ports::FILTER_RES>()
 		,1.0/m_fs);
+	auto filter_lfo=portmap().get<Ports::FILTER_LFO>()/12.0f;
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
 		{
 		auto n=std::min(n_frames,buffer_in.size());
+		LFO.generate(0.5f/m_fs,1.0f,waveform_lfo,buffer_lfo.begin(),n);
+		std::transform(buffer_lfo.begin(),buffer_lfo.end(),buffer_lfo.begin()
+			,[filter_lfo](float x)
+				{return std::exp2(x*filter_lfo);}
+			);
 		for(size_t k=0;k<voices.size();++k)
 			{
 			if(voices[k].amplitude()>1e-3f || voices[k].started())
@@ -159,7 +169,7 @@ void Engine::generate(size_t n_frames) noexcept
 				memset(bufftemp[0].begin(),0,sizeof(bufftemp)/bufftemp.size());
 				voices[k].generate(waveform
 					,detune,suboct,buffer_in.begin(),bufftemp[0].begin(),n);
-				voices[k].filterApply(bufftemp[0].begin(),filter,bufftemp[1].begin(),n);
+				voices[k].filterApply(bufftemp[0].begin(),filter,buffer_lfo.begin(),bufftemp[1].begin(),n);
 				voices[k].modulate(bufftemp[1].begin(),voice_adsr,bufftemp[0].begin(),n);
 				
 				addToMix(bufftemp[0].begin(),bufftemp[2].begin(),n);
