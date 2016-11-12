@@ -46,9 +46,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 			}
 
 		static void operator delete(void* pointer)
-			{
-			free(pointer);
-			}
+			{free(pointer);}
 
 	private:
 		LV2Plug::FeatureDescriptor m_features;
@@ -58,6 +56,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		int64_t m_position;
 		int64_t n_frames_prev;
 		
+		double lfo_freq;
 		Adsr::Params voice_adsr;
 		ArrayStatic<int8_t,128> keys;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
@@ -70,6 +69,11 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		void processEvents() noexcept;
 		void voiceActivate(int8_t key,float amplitude) noexcept;
 		void positionUpdate(const LV2_Atom_Object& obj) noexcept;
+		void lfoFreqUpdate() noexcept
+			{
+			lfo_freq=static_cast<double>(m_tempo)
+				/(60.0*m_fs*static_cast<double>(portmap().get<Ports::LFO_PERIOD>()/12.0));
+			}
 	};
 
 static float frequencyGet(float key) noexcept
@@ -178,8 +182,8 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			,"Tempo has wrong type");
 		if(tempo!=m_tempo)
 			{
-			printf("Tempo set %.7g\n",temp->body);
 			m_tempo=tempo;
+			lfoFreqUpdate();
 			}
 		}
 
@@ -195,7 +199,7 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 		if(pos_new < m_position || (m_speed!=1.0f && pos_new!=m_position)
 			|| pos_new - m_position > 64*n_frames_prev)
 			{
-			printf("Position set %lld->%lld\n",m_position,pos_new);
+			LFO.phaseSet(pos_new,lfo_freq);
 			}
 		m_position=pos_new;
 		}
@@ -214,18 +218,27 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::MAIN_SUSTAIN>()
 		,portmap().get<Ports::MAIN_RELEASE>());
 
+	auto filter_adsr=AdsrScaler::Params(m_fs
+		,std::exp2(portmap().get<Ports::FILTER_ENVELOPE>()/12.0f)
+		,portmap().get<Ports::FILTER_ATTACK>()
+		,portmap().get<Ports::FILTER_DECAY>()
+		,portmap().get<Ports::FILTER_SUSTAIN>()
+		,portmap().get<Ports::FILTER_RELEASE>());
+
 	auto filter=filterSetup(portmap().get<Ports::FILTER_BASE>()
 		,portmap().get<Ports::FILTER_KEYB>()
 		,portmap().get<Ports::FILTER_RES>()
 		,1.0/m_fs);
 	auto filter_lfo=portmap().get<Ports::FILTER_LFO>()/12.0f;
+	auto lfo_phase=waveform_lfo.size()*portmap().get<Ports::LFO_PHASE>();
+	lfoFreqUpdate();
 	auto main_gain=portmap().get<Ports::MAIN_GAIN>();
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
 		{
 		auto n=std::min(n_frames,buffer_in.size());
-		LFO.generate(0.5f/m_fs,1.0f,waveform_lfo,buffer_lfo.begin(),n);
+		LFO.generate(lfo_freq,1.0f,lfo_phase,waveform_lfo,buffer_lfo.begin(),n);
 		std::transform(buffer_lfo.begin(),buffer_lfo.end(),buffer_lfo.begin()
 			,[filter_lfo](float x)
 				{return std::exp2(x*filter_lfo);}
@@ -237,7 +250,8 @@ void Engine::generate(size_t n_frames) noexcept
 				memset(bufftemp[0].begin(),0,sizeof(bufftemp)/bufftemp.size());
 				voices[k].generate(waveform
 					,detune,suboct,buffer_in.begin(),bufftemp[0].begin(),n);
-				voices[k].filterApply(bufftemp[0].begin(),filter,buffer_lfo.begin(),bufftemp[1].begin(),n);
+				voices[k].filterApply(bufftemp[0].begin(),filter,filter_adsr
+					,buffer_lfo.begin(),bufftemp[1].begin(),n);
 				voices[k].modulate(bufftemp[1].begin(),voice_adsr,bufftemp[0].begin(),n);
 				
 				addToMix(bufftemp[0].begin(),bufftemp[2].begin(),n);
