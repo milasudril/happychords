@@ -7,7 +7,7 @@
 
 namespace Happychords
 	{
-	class Framepair
+	class PRIVATE Framepair
 		{
 		public:
 			explicit constexpr Framepair() noexcept:m_vec{0.0f,0.0f,0.0f,0.0f}{}

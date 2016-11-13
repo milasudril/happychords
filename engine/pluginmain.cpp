@@ -14,6 +14,8 @@
 #include "voice.hpp"
 #include "sawtooth.hpp"
 #include "sine.hpp"
+#include "gatesequence.hpp"
+#include "../common/blob.hpp"
 #include <lv2plug/lv2plug.hpp>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
 #include <cmath>
@@ -25,6 +27,8 @@ using namespace Happychords;
 
 static constexpr auto waveform=Happychords::sawtooth();
 static constexpr auto waveform_lfo=Happychords::sine();
+
+BLOB(pattern_init,"patterns/dance_000.txt");
 
 class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	{
@@ -56,12 +60,12 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		int64_t n_frames_prev;
 		
 		double lfo_freq;
-		ArrayStatic<int8_t,128> keys;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
 		ArrayStatic<float,64> buffer_lfo;
 		ArrayStatic<Voice<waveform.size()>,8> voices;
 		ArrayStatic<float,64> buffer_in;
 		ArrayStatic<ArrayStatic<Framepair,32>,3> bufftemp;
+		ArrayStatic<int8_t,128> keys;
 
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;

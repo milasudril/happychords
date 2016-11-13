@@ -4,15 +4,14 @@
 #define HAPPYCHORDS_ADSRSCALER_HPP
 
 #include "vectortype.hpp"
-
+#include <lv2plug/visibility.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
 
-
 namespace Happychords
 	{      
-	class AdsrScaler
+	class PRIVATE AdsrScaler
 		{
 		public:
 			class Params

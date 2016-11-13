@@ -10,7 +10,7 @@
 
 namespace Happychords
 	{      
-	class Adsr
+	class PRIVATE Adsr
 		{
 		public:
 			class Params

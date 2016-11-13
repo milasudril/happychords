@@ -13,7 +13,7 @@
 namespace Happychords
 	{
 	class Container;
-	class SwitchBase
+	class PRIVATE SwitchBase
 		{
 		public:
 			enum class State:unsigned int{UP,DOWN};

@@ -11,7 +11,7 @@
 
 namespace Happychords
 	{
-	CairoSurface imageResourceLoad(const uint8_t* begin,const uint8_t* end);
+	CairoSurface PRIVATE imageResourceLoad(const uint8_t* begin,const uint8_t* end);
 	}
 
 #endif

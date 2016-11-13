@@ -13,7 +13,7 @@
 namespace Happychords
 	{
 	class Container;
-	class KnobBase
+	class PRIVATE KnobBase
 		{
 		public:
 			KnobBase(Container& parent,const char* caption,double min,double max,double value);

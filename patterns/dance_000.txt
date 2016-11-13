@@ -1,0 +1,21 @@
+# Sample pattern for Happychords. This file has is released under
+# the CC0 license.
+# 
+tpqn: 8  # Use 8 tics per quarter note
+#
+# The table contains absolute time, and event type.
+# Notice the loop event at the end, which makes it
+# possible to end with a rest.
+#
+fields: time; type 
+# Values are delimited by a tab, and must not end with any whitespace.
+data:
+0	note on
+1	note off
+2	note on
+3	note off
+4	note on
+6	note off
+8	loop
+#
+#end of sample pattern
