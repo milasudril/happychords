@@ -7,6 +7,8 @@
 
 #include <cmath>
 #include <cstddef>
+#include <cstdio>
+
 
 namespace Happychords
 	{      
@@ -104,7 +106,8 @@ namespace Happychords
 			static float attack_handler(AdsrScaler& self,const Params params,float value)
              	{
                 value*=params.attackGet();
-                if(value > params.baseGet())
+                if((value>params.baseGet() && params.baseGet()>1)
+					|| (value<params.baseGet() && params.baseGet()<1 ))
                 	{self.state=decay_handler;}
                 return value;
               	}
@@ -112,7 +115,8 @@ namespace Happychords
 			static float decay_handler(AdsrScaler& self,const Params params,float value)
 				{
 				value*=params.decayGet(); 
-				if(value < params.sustainGet())
+				if((value<params.sustainGet() && params.baseGet()>1)
+					|| (value>params.sustainGet() && params.baseGet()<1))
 					{
 					self.state=sustain_handler;
 					return params.sustainGet();
@@ -126,7 +130,8 @@ namespace Happychords
 			static float release_handler(AdsrScaler& self,const Params params,float value)
 				{
 				value*=params.releaseGet();
-				if(value < 1.0f)
+				if( (value < 1.0f && params.baseGet()>1)
+					|| (value>1.0f && params.baseGet()<1) )
 					{
 					self.state=done_handler;
 					return 1.0f;

@@ -32,6 +32,7 @@ static gboolean draw_stuff(GtkWidget *widget, GdkEventExpose *event,void* data)
 
 	auto color=panel->borderColorGet();
 	cairo_set_source_rgba(context,color.r,color.g,color.b,1);
+	cairo_set_operator(context,CAIRO_OPERATOR_MULTIPLY);
 	cairo_rounded_rect(context,alloc.x,alloc.y,alloc.width,alloc.height,4);
 	cairo_stroke(context);
 	return FALSE;
