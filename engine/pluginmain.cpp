@@ -194,6 +194,8 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			{
 			m_tempo=tempo;
 			lfoFreqUpdate();
+			m_gate.timescaleSet(tempo,m_fs);
+			m_gate.positionSet(m_position);
 			}
 		}
 
@@ -210,6 +212,7 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			|| pos_new - m_position > 64*n_frames_prev)
 			{
 			LFO.phaseSet(pos_new,lfo_freq);
+			m_gate.positionSet(pos_new);
 			}
 		m_position=pos_new;
 		}
