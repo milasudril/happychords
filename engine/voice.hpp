@@ -41,15 +41,13 @@ namespace Happychords
 			float amplitude() const noexcept
 				{return m_amplitude.left<0>();}
 
-			void start(float f,float a,Adsr::Params adsr,float keytrack
-				,int8_t key) noexcept
+			void start(float f,float a,float keytrack,int8_t key) noexcept
 				{
 				m_f=f;
 				m_gain=a;
 				m_modulator.attack();
-				auto a_1=m_modulator.stateUpdate(adsr,0.0f);
 				m_filter.stateReset();
-				m_amplitude=Framepair{0.0f,0.0f,a_1,a_1};
+				m_amplitude=Framepair{0.0f,0.0f,0.0f,0.0f};
 				m_key=key;
 				m_keytrack=std::exp2((key-69)*keytrack/12.0f);
 				m_f_0=1.0f;
@@ -125,14 +123,15 @@ namespace Happychords
 		auto amplitude=m_amplitude;
 		while(n!=0)
 			{
+			auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
+			auto a_1=mod.stateUpdate(adsr,a_0);
+			amplitude=Framepair{a_0,a_0,a_1,a_0};
+
 			*buffer_out=amplitude*(*buffer_in);
 
 			++buffer_out;
 			++buffer_in;
 
-			auto a_1=mod.stateUpdate(adsr,amplitude.left<1>());
-			auto a_2=mod.stateUpdate(adsr,a_1);
-			amplitude=Framepair{a_1,a_1,a_2,a_2};
 			n-=2;
 			}
 		m_amplitude=amplitude;

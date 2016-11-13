@@ -32,7 +32,6 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
 			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0),n_frames_prev(0)
-			,voice_adsr(fs,1e-3f,1e-1f,0.5f,1e-1)
 			{}
 
 		void process(size_t n_frames) noexcept;
@@ -57,7 +56,6 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		int64_t n_frames_prev;
 		
 		double lfo_freq;
-		Adsr::Params voice_adsr;
 		ArrayStatic<int8_t,128> keys;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
 		ArrayStatic<float,64> buffer_lfo;
@@ -95,7 +93,7 @@ void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 			voice_min=k;
 			}
 		}
-	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude,voice_adsr
+	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude
 		,portmap().get<Ports::FILTER_KEYB>(),key);
 	keys[key]=voice_min;
 	}
@@ -212,7 +210,7 @@ void Engine::generate(size_t n_frames) noexcept
 	auto buffer_r=portmap().get<Ports::OUTPUT_R>();
 	auto detune=portmap().get<Ports::VOICE_DETUNE>();
 	auto suboct=make_bool( portmap().get<Ports::VOICE_SUBOCT>() );
-	voice_adsr=Adsr::Params(m_fs
+	auto voice_adsr=Adsr::Params(m_fs
 		,portmap().get<Ports::MAIN_ATTACK>()
 		,portmap().get<Ports::MAIN_DECAY>()
 		,portmap().get<Ports::MAIN_SUSTAIN>()
