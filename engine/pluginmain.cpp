@@ -5,6 +5,7 @@
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug","rel":"external"}
+//@				,{"ref":"../patterns/gallop_backwards.txt","rel":"file"}
 //@			]
 //@		}]
 //@	}
@@ -29,7 +30,7 @@ using namespace Happychords;
 static constexpr auto waveform=Happychords::sawtooth();
 static constexpr auto waveform_lfo=Happychords::sine();
 
-BLOB(pattern_init,"patterns/dance_000.txt");
+BLOB(pattern_init,"patterns/gallop_backwards.txt");
 
 class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	{
@@ -273,6 +274,8 @@ void Engine::generate(size_t n_frames) noexcept
 			}
 		
 		m_gate.modulate(bufftemp[2].begin(),gate_adsr,bufftemp[1].begin(),n);
+		mix(bufftemp[2].begin(),bufftemp[1].begin(),portmap().get<Ports::GATE_DEPTH>()
+			,bufftemp[1].begin(),n);
 
 		std::transform(bufftemp[1].begin(),bufftemp[1].begin() + n/2,bufftemp[1].begin()
 			,[main_gain](Framepair x)

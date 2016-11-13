@@ -33,6 +33,23 @@ namespace Happychords
 			}
 		}
 
+	static void mix(const Framepair* buffer_a,const Framepair* buffer_b
+		,float xi
+		,Framepair* buffer_out,size_t n)
+		{
+		auto xi_comp=1.0f - xi;
+		while(n!=0)
+			{
+			auto v1=*buffer_a;
+			auto v2=*buffer_b;
+			*buffer_out=xi_comp*v1 + xi*v2;
+			++buffer_a;
+			++buffer_b;
+			++buffer_out;
+			n-=2;
+			}
+		}
+
 	static void demux(const Framepair* buffer_in,float* buffer_l,float* buffer_r,size_t n)
 		{
 		while(n!=0)
