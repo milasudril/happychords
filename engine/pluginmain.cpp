@@ -15,6 +15,7 @@
 #include "sawtooth.hpp"
 #include "sine.hpp"
 #include "gatesequence.hpp"
+#include "gate.hpp"
 #include "../common/blob.hpp"
 #include <lv2plug/lv2plug.hpp>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
@@ -36,6 +37,9 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
 			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0),n_frames_prev(0)
+			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
+				,reinterpret_cast<const int8_t*>(pattern_init_end))
+			,m_gate(m_gate_seq,m_tempo,fs)
 			{}
 
 		void process(size_t n_frames) noexcept;
@@ -65,6 +69,9 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		ArrayStatic<Voice<waveform.size()>,8> voices;
 		ArrayStatic<float,64> buffer_in;
 		ArrayStatic<ArrayStatic<Framepair,32>,3> bufftemp;
+		GateSequence m_gate_seq;
+		Gate m_gate;
+
 		ArrayStatic<int8_t,128> keys;
 
 		void generate(size_t n_frames) noexcept;
@@ -235,6 +242,11 @@ void Engine::generate(size_t n_frames) noexcept
 	auto lfo_phase=waveform_lfo.size()*portmap().get<Ports::LFO_PHASE>();
 	lfoFreqUpdate();
 	auto main_gain=portmap().get<Ports::MAIN_GAIN>();
+	auto gate_adsr=Adsr::Params(m_fs
+		,portmap().get<Ports::GATE_ATTACK>()
+		,portmap().get<Ports::GATE_DECAY>()
+		,portmap().get<Ports::GATE_SUSTAIN>()
+		,portmap().get<Ports::GATE_RELEASE>());
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
 	while(n_frames!=0)
@@ -260,11 +272,13 @@ void Engine::generate(size_t n_frames) noexcept
 				}
 			}
 		
-		std::transform(bufftemp[2].begin(),bufftemp[2].begin() + n/2,bufftemp[2].begin()
+		m_gate.modulate(bufftemp[2].begin(),gate_adsr,bufftemp[1].begin(),n);
+
+		std::transform(bufftemp[1].begin(),bufftemp[1].begin() + n/2,bufftemp[1].begin()
 			,[main_gain](Framepair x)
 				{return main_gain*x;}
 			);
-		demux(bufftemp[2].begin(),buffer_l,buffer_r,n);
+		demux(bufftemp[1].begin(),buffer_l,buffer_r,n);
 
 
 		n_frames-=n;

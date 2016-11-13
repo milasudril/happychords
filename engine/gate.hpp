@@ -1,10 +1,14 @@
-//@	{"targets":[{"name":"gate.hpp","type":"include"}]}
+//@	{
+//@	 "targets":[{"name":"gate.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"gate.o","rel":"implementation"}]
+//@	}
 
 #ifndef HAPPYCHORDS_GATE_HPP
 #define HAPPYCHORDS_GATE_HPP
 
 #include "gatesequence.hpp"
 #include "adsr.hpp"
+#include "framepair.hpp"
 #include <cmath>
 #include <random>
 
@@ -14,48 +18,42 @@ namespace Happychords
 		{
 		public:
 			Gate(GateSequence&&)=delete;
-			explicit Gate(const GateSequence& seq):m_seq_current(m_seq.begin())
-				,m_seq_begin(m_seq.begin()),m_seq_end(m_seq.end())
-				,m_amplitude(0.0f,0.0f,0.0f,0.0f)
-				{}
+			explicit Gate(const GateSequence& seq,float tempo,double fs):
+				 m_amplitude(0.0f,0.0f,0.0f,0.0f)
+				,m_seq_pos(0)
+				,m_seq_current(seq.begin())
+				,m_seq_begin(seq.begin()),m_seq_end(seq.end())
+				,m_tpqn(seq.tpqnGet())
+				{
+				timescaleSet(tempo,fs);
+				}
 
 			void modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buffer_out
 				,size_t n) noexcept;
 
+			void positionSet(int64_t frame) noexcept
+				{
+				if(m_seq_begin==m_seq_end)
+					{return;}
+				auto seq_length=static_cast<size_t>(m_timescale * (m_seq_end - 1)->time + 0.5);
+				m_seq_pos=frame%seq_length;
+				seek();
+				}
+
+			void timescaleSet(float tempo,double fs) noexcept
+				{m_timescale=fs*60.0/(tempo*m_tpqn);}
+
 		private:
+			void seek() noexcept;
 			Adsr m_modulator;
 			Framepair m_amplitude;
+			size_t m_seq_pos;
 			const GateSequence::Event* m_seq_current;
 			const GateSequence::Event* m_seq_begin;
 			const GateSequence::Event* m_seq_end;
+			double m_timescale;
+			size_t m_tpqn;
 		};
-
-
-	Gate::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept
-		{
-		auto mod=m_modulator;
-		auto amplitude=m_amplitude;
-		auto seq_current=m_seq_current;
-		auto seq_begin=m_seq_begin;
-		auto seq_end=m_seq_end;
-		
-		while(n!=0)
-			{
-			auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
-			auto a_1=mod.stateUpdate(adsr,a_0);
-			amplitude=Framepair{a_0,a_0,a_1,a_0};
-
-			*buffer_out=amplitude*(*buffer_in);
-
-			++buffer_out;
-			++buffer_in;
-
-			n-=2;
-			}
-		m_seq_current=seq_current;
-		m_amplitude=amplitude;
-		m_modulator=mod;
-		}
 	}
 
 #endif

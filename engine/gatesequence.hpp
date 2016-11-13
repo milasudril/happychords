@@ -45,6 +45,9 @@ namespace Happychords
 			const Event* end() const noexcept
 				{return m_events.data() + m_events.size();}
 
+			size_t tpqnGet() const noexcept
+				{return m_tpqn;}
+
 		private:
 			static inline void from_string(const std::string& value,GateSequence::Event::Type& type);
 
