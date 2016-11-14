@@ -37,8 +37,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	public:
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
-			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0)
-			,n_frames_prev(0),voice_current(0)
+			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_beat_old(0.0)
+			,voice_current(0)
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
 			,m_gate(m_gate_seq,m_tempo,fs)
@@ -62,8 +62,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		double m_fs;
 		float m_tempo;
 		float m_speed;
-		int64_t m_position;
-		int64_t n_frames_prev;
+		double m_beat_old;
+
 		size_t voice_current;
 		double lfo_freq;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
@@ -160,11 +160,18 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 	LV2_Atom* bpm=nullptr;
 	LV2_Atom* speed=nullptr;
 	LV2_Atom* frame=nullptr;
-	LV2_Atom* beat=nullptr;
+	LV2_Atom* bar=nullptr;
+	LV2_Atom* barbeat=nullptr;
+	LV2_Atom* beatsperbar=nullptr;
 
-	lv2_atom_object_get(&obj,m_features.Beat()
-		,&beat,m_features.beatsPerMinute(),&bpm,m_features.speed(),&speed
-		,m_features.frame(),&frame,m_features.Beat(),&beat,NULL);
+	lv2_atom_object_get(&obj
+		,m_features.beatsPerMinute(),&bpm
+		,m_features.speed(),&speed
+		,m_features.frame(),&frame
+		,m_features.bar(),&bar
+		,m_features.barBeat(),&barbeat
+		,m_features.beatsPerBar(),&beatsperbar
+		,NULL);
 	
 	auto speed_val=1.0f;
 	if(speed && speed->type==m_features.Float())
@@ -189,28 +196,38 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			}
 		}
 
-	if(frame && frame->type==m_features.Long())
+	if(barbeat && barbeat->type==m_features.Float()
+		&& bar && bar->type==m_features.Long()
+		&& beatsperbar && beatsperbar->type==m_features.Float())
 		{
-		auto temp=reinterpret_cast<const LV2_Atom_Long*>(frame);
-		auto pos_new=temp->body;
 
-		printf("Beat: %p\n",beat);
+		auto beatval=reinterpret_cast<const LV2_Atom_Float*>(barbeat);
+		auto barval=reinterpret_cast<const LV2_Atom_Long*>(bar);
+		auto bpbval=reinterpret_cast<const LV2_Atom_Float*>(beatsperbar);
+
+		auto beat=beatval->body + static_cast<double>(bpbval->body)
+			*static_cast<double>(barval->body);
 
 	//	Detect when to reposition LFO and gate cursors. Only update cursors
 	//	when
 	//		1. The head has moved backwards (This cannot be regular playback)
 	//		2. Playback is stopped, and the position is updated
-	//		3. The head has moved an unexpected distance into the future
-		if( pos_new < m_position
-			|| (m_speed!=1.0f && pos_new!=m_position)
-			|| pos_new - m_position > 64*n_frames_prev )
+	//		3. The playback has started
+	//		4. The head has moved an unexpected distance into the future
+		if(beat<m_beat_old
+			|| (speed_val!=1.0f && beat!=m_beat_old)
+			|| (speed_val!=m_speed)
+			|| (beat - m_beat_old > static_cast<double>(bpbval->body) ) )
 			{
-			
-		//	LFO.phaseSet(pos_new,lfo_freq);
-		//	m_gate.positionSet(pos_new);
+		//	Update positions
+			m_gate.positionSet(beat);
+		//	The LFO measure time in frames not beats. Fix this?
+			LFO.phaseSet(m_fs*beat/(60.0*m_tempo),lfo_freq);
 			}
-		m_position=pos_new;
+		m_beat_old=beat;
 		}
+
+
 	m_speed=speed_val;
 	}
 
@@ -292,7 +309,6 @@ void Engine::process(size_t n_frames) noexcept
 	{
 	processEvents();
 	generate(n_frames);
-	n_frames_prev=n_frames;
 	}
 
 

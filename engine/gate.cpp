@@ -11,19 +11,18 @@ using namespace Happychords;
 void Gate::seek() noexcept
 	{
 	m_seq_current=std::lower_bound(m_seq_begin,m_seq_end,m_seq_pos
-		,[this](const GateSequence::Event& a,size_t b)
-			{
-			return m_timescale*a.time < b;
-			});
+		,[](const GateSequence::Event& a,double b)
+			{return a.time < b;}
+		);
 	}
 
 static inline const GateSequence::Event* eventsProcess(const GateSequence::Event* begin
-	,const GateSequence::Event* end,double time_scale,size_t seq_pos,Adsr& mod)
+	,const GateSequence::Event* end,double seq_pos,Adsr& mod)
 	{
 	while(begin!=end)
 		{
 		auto e=*begin;
-		if(time_scale*e.time > seq_pos)
+		if(e.time > seq_pos)
 			{return begin;}
 		switch(e.type)
 			{
@@ -54,8 +53,8 @@ void Gate::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buff
 	
 	while(n!=0)
 		{
-		seq_current=eventsProcess(seq_current,seq_end,time_scale,seq_pos,mod);
-		++seq_pos;
+		seq_current=eventsProcess(seq_current,seq_end,seq_pos,mod);
+		seq_pos+=time_scale;
 		if(seq_current==seq_end)
 			{
 			seq_current=seq_begin;
@@ -63,8 +62,8 @@ void Gate::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buff
 			}
 		auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
 
-		seq_current=eventsProcess(seq_current,seq_end,time_scale,seq_pos,mod);
-		++seq_pos;
+		seq_current=eventsProcess(seq_current,seq_end,seq_pos,mod);
+		seq_pos+=time_scale;
 		if(seq_current==seq_end)
 			{
 			seq_current=seq_begin;
