@@ -24,6 +24,7 @@
 #include <utility>
 #include <algorithm>
 #include <random>
+#include <unistd.h>
 
 using namespace Happychords;
 
@@ -42,7 +43,11 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
 			,m_gate(m_gate_seq,m_tempo,fs)
-			{}
+			{
+			char buffer[4096];
+			printf("%s\n",getcwd(buffer,4096));
+			fflush(stdout);
+			}
 
 		void process(size_t n_frames) noexcept;
 

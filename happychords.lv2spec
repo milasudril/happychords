@@ -170,6 +170,13 @@
 			,"prefix":"Gate"
 			}
 			,{
+			 "name":"Pattern","type":"control","direction":"in"
+			,"minimum":0.0
+			,"maximum":1.0
+			,"default":0.8
+			,"prefix":"Gate"
+			}
+			,{
 			 "name":"Gain","type":"control","direction":"in"
 			,"minimum":0
 			,"maximum":2

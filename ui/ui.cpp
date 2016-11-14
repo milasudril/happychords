@@ -19,6 +19,7 @@
 #include "switch.hpp"
 #include "box.hpp"
 #include "panel.hpp"
+#include "stringchoice.hpp"
 #include "imageresource.hpp"
 #include "cairocontext.hpp"
 
@@ -145,12 +146,13 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 							,m_main_gain(m_main_gain_box.paddingSet(4),*this)
 					,m_gate(m_main,"Gate")
 						,m_gate_box(m_gate.paddingSet(4))
-							,m_gate_row(m_gate_box.paddingSet(0),1)
-								,m_gate_attack(m_gate_row.paddingSet(0).insertModeSet(Box::InsertMode::EXPAND),*this)
+							,m_gate_row(m_gate_box.paddingSet(4),1)
+								,m_gate_attack(m_gate_row.paddingSet(4).insertModeSet(Box::InsertMode::EXPAND),*this)
 								,m_gate_decay(m_gate_row,*this)
 								,m_gate_sustain(m_gate_row,*this)
 								,m_gate_release(m_gate_row,*this)
 								,m_gate_depth(m_gate_row,*this)
+							,m_gate_pattern(m_gate_box,*this)
 
 			{
 			styleSet(m_voice);
@@ -184,6 +186,9 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 			styleSet(m_gate_depth);
 	
 			styleSet(m_suboct);
+			char buffer[4096];
+			printf("%s\n",getcwd(buffer,4096));
+			fflush(stdout);
 			}
 
 		~UIGtk()
@@ -205,6 +210,9 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 		void eventProcess(SwitchBase& sw)
 			{portWrite<port_id>(sw.stateGet()==SwitchBase::State::UP?0.0f:1.0f);}
 
+		template<unsigned int port_id>
+		void eventProcess(StringchoiceBase& choice)
+			{}
 
 		void lfoPeriodUpdate(float value)
 			{m_lfo_period.valueSet(value);}
@@ -320,6 +328,7 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 							Knob< Port<Ports::GATE_SUSTAIN>,UIGtk> m_gate_sustain;
 							Knob< Port<Ports::GATE_RELEASE>,UIGtk> m_gate_release;
 							Knob< Port<Ports::GATE_DEPTH>,UIGtk> m_gate_depth;
+						Stringchoice< Port<Ports::GATE_PATTERN>,UIGtk> m_gate_pattern;
 	};
 
 template<>
