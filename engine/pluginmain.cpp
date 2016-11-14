@@ -37,7 +37,8 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	public:
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
-			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0),n_frames_prev(0)
+			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_position(0)
+			,n_frames_prev(0),voice_current(0)
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
 			,m_gate(m_gate_seq,m_tempo,fs)
@@ -63,11 +64,12 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		float m_speed;
 		int64_t m_position;
 		int64_t n_frames_prev;
-		
+		size_t voice_current;
 		double lfo_freq;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
 		ArrayStatic<float,64> buffer_lfo;
-		ArrayStatic<Voice<waveform.size()>,8> voices;
+		ArrayStatic<Voice<waveform.size()>,16> voices;
+		
 		ArrayStatic<float,64> buffer_in;
 		ArrayStatic<ArrayStatic<Framepair,32>,3> bufftemp;
 		GateSequence m_gate_seq;
@@ -93,21 +95,11 @@ static float frequencyGet(float key) noexcept
 
 void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 	{
-	static_assert(voices.size()!=0,"No voices?");
-	auto voice_min=0;
-	auto a_min=voices[0].amplitude();
-	for(int k=1;k<static_cast<int>( voices.size() );++k)
-		{
-		auto a=voices[k].amplitude();
-		if(a<a_min)
-			{
-			a_min=a;
-			voice_min=k;
-			}
-		}
-	voices[voice_min].start(frequencyGet(key)/m_fs,amplitude
+	auto voice=voice_current%voices.size();
+	voices[voice_current%voices.size()].start(frequencyGet(key)/m_fs,amplitude
 		,portmap().get<Ports::FILTER_KEYB>(),key);
-	keys[key]=voice_min;
+	++voice_current;
+	keys[key]=voice;
 	}
 
 void Engine::processEvents() noexcept
@@ -165,15 +157,14 @@ static Filter::Params filterSetup(float filter_base,float keytrack,float Q,doubl
 
 void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 	{
-	LV2_Atom* beat=nullptr;
 	LV2_Atom* bpm=nullptr;
 	LV2_Atom* speed=nullptr;
-	LV2_Atom* fps=nullptr;
 	LV2_Atom* frame=nullptr;
+	LV2_Atom* beat=nullptr;
 
 	lv2_atom_object_get(&obj,m_features.Beat()
 		,&beat,m_features.beatsPerMinute(),&bpm,m_features.speed(),&speed
-		,m_features.frame(),&frame,m_features.fps(),&fps,NULL);
+		,m_features.frame(),&frame,m_features.Beat(),&beat,NULL);
 	
 	auto speed_val=1.0f;
 	if(speed && speed->type==m_features.Float())
@@ -195,7 +186,6 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			m_tempo=tempo;
 			lfoFreqUpdate();
 			m_gate.timescaleSet(tempo,m_fs);
-			m_gate.positionSet(m_position);
 			}
 		}
 
@@ -203,16 +193,21 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 		{
 		auto temp=reinterpret_cast<const LV2_Atom_Long*>(frame);
 		auto pos_new=temp->body;
+
+		printf("Beat: %p\n",beat);
+
 	//	Detect when to reposition LFO and gate cursors. Only update cursors
 	//	when
 	//		1. The head has moved backwards (This cannot be regular playback)
 	//		2. Playback is stopped, and the position is updated
 	//		3. The head has moved an unexpected distance into the future
-		if(pos_new < m_position || (m_speed!=1.0f && pos_new!=m_position)
-			|| pos_new - m_position > 64*n_frames_prev)
+		if( pos_new < m_position
+			|| (m_speed!=1.0f && pos_new!=m_position)
+			|| pos_new - m_position > 64*n_frames_prev )
 			{
-			LFO.phaseSet(pos_new,lfo_freq);
-			m_gate.positionSet(pos_new);
+			
+		//	LFO.phaseSet(pos_new,lfo_freq);
+		//	m_gate.positionSet(pos_new);
 			}
 		m_position=pos_new;
 		}
