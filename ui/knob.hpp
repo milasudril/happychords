@@ -72,23 +72,13 @@ namespace Happychords
 		,std::enable_if_t<
 			std::is_same< float,std::remove_const_t<typename Paraminfo::type_logical> >::value
 		,int> n=0>
-	class PRIVATE Knob:private KnobBase
+	class PRIVATE Knob:public KnobBase
 		{
 		public:
 			Knob(Container& parent,EventHandler& handler):KnobBase(parent
 				,Paraminfo::name(),Paraminfo::minimum(),Paraminfo::maximum(),Paraminfo::valueDefault())
 				,m_handler(handler)
 				{}
-
-			using KnobBase::valueSet;
-			using KnobBase::angleGet;
-			using KnobBase::valueGet;
-			using KnobBase::colorSet;
-			using KnobBase::colorGet;
-			using KnobBase::captionColorSet;
-			using KnobBase::entryBackgroundSet;
-			using KnobBase::entryForegroundSet;
-
 		private:
 			void changeEmmit() noexcept
 				{m_handler.template eventProcess< Paraminfo::id() >(*this);}

@@ -60,6 +60,11 @@ class PRIVATE UIBase:public Container
 			m_container=plugincontainer;
 			}
 
+		~UIBase()
+			{
+			gtk_widget_destroy(reinterpret_cast<GtkWidget*>(m_container));
+			}
+
 		void* widgetGet() noexcept
 			{return m_container;}
 
@@ -73,6 +78,26 @@ class PRIVATE UIBase:public Container
 	private:
 		GtkContainer* m_container;
 	};
+
+static void styleSet(Happychords::Panel& panel)
+	{
+	panel.borderColorSet(COLOR_KNOB);
+	panel.captionColorSet(COLOR_TEXT);
+	}
+
+static void styleSet(Happychords::KnobBase& knob)
+	{
+	knob.colorSet(COLOR_KNOB);
+	knob.captionColorSet(COLOR_TEXT);
+	knob.entryBackgroundSet(COLOR_ENTRY);
+	knob.entryForegroundSet(COLOR_TEXT);
+	}
+
+static void styleSet(Happychords::SwitchBase& sw)
+	{
+	sw.backgroundSet(COLOR_BG);
+	sw.captionColorSet(COLOR_TEXT);
+	}
 
 class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 	{
@@ -128,114 +153,37 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 								,m_gate_depth(m_gate_row,*this)
 
 			{
-			m_voice.borderColorSet(COLOR_KNOB);
-			m_voice.captionColorSet(COLOR_TEXT);
-			m_lfo.borderColorSet(COLOR_KNOB);
-			m_lfo.captionColorSet(COLOR_TEXT);
-			m_fc_env.borderColorSet(COLOR_KNOB);
-			m_fc_env.captionColorSet(COLOR_TEXT);
-			m_fc_mix.borderColorSet(COLOR_KNOB);
-			m_fc_mix.captionColorSet(COLOR_TEXT);
-		//	m_foo.borderColorSet(COLOR_KNOB);
-		//	m_foo.captionColorSet(COLOR_TEXT);
-			m_main_env.borderColorSet(COLOR_KNOB);
-			m_main_env.captionColorSet(COLOR_TEXT);
-			m_gate.borderColorSet(COLOR_KNOB);
-			m_gate.captionColorSet(COLOR_TEXT);
-
-
-
-			m_detune.colorSet(COLOR_KNOB);
-			m_detune.captionColorSet(COLOR_TEXT);
-			m_detune.entryBackgroundSet(COLOR_ENTRY);
-			m_detune.entryForegroundSet(COLOR_TEXT);
-			m_lfo_period.colorSet(COLOR_KNOB);
-			m_lfo_period.captionColorSet(COLOR_TEXT);
-			m_lfo_period.entryBackgroundSet(COLOR_ENTRY);
-			m_lfo_period.entryForegroundSet(COLOR_TEXT);
-			m_lfo_phase.colorSet(COLOR_KNOB);
-			m_lfo_phase.captionColorSet(COLOR_TEXT);
-			m_lfo_phase.entryBackgroundSet(COLOR_ENTRY);
-			m_lfo_phase.entryForegroundSet(COLOR_TEXT);
-			m_filter_attack.colorSet(COLOR_KNOB);
-			m_filter_attack.captionColorSet(COLOR_TEXT);
-			m_filter_attack.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_attack.entryForegroundSet(COLOR_TEXT);
-			m_filter_decay.colorSet(COLOR_KNOB);
-			m_filter_decay.captionColorSet(COLOR_TEXT);
-			m_filter_decay.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_decay.entryForegroundSet(COLOR_TEXT);
-			m_filter_sustain.colorSet(COLOR_KNOB);
-			m_filter_sustain.captionColorSet(COLOR_TEXT);
-			m_filter_sustain.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_sustain.entryForegroundSet(COLOR_TEXT);
-			m_filter_release.colorSet(COLOR_KNOB);
-			m_filter_release.captionColorSet(COLOR_TEXT);
-			m_filter_release.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_release.entryForegroundSet(COLOR_TEXT);
-			m_filter_base.colorSet(COLOR_KNOB);
-			m_filter_base.captionColorSet(COLOR_TEXT);
-			m_filter_base.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_base.entryForegroundSet(COLOR_TEXT);
-			m_filter_lfo.colorSet(COLOR_KNOB);
-			m_filter_lfo.captionColorSet(COLOR_TEXT);
-			m_filter_lfo.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_lfo.entryForegroundSet(COLOR_TEXT);
-			m_filter_env.colorSet(COLOR_KNOB);
-			m_filter_env.captionColorSet(COLOR_TEXT);
-			m_filter_env.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_env.entryForegroundSet(COLOR_TEXT);
-			m_filter_keyb.colorSet(COLOR_KNOB);
-			m_filter_keyb.captionColorSet(COLOR_TEXT);
-			m_filter_keyb.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_keyb.entryForegroundSet(COLOR_TEXT);
-			m_filter_res.colorSet(COLOR_KNOB);
-			m_filter_res.captionColorSet(COLOR_TEXT);
-			m_filter_res.entryBackgroundSet(COLOR_ENTRY);
-			m_filter_res.entryForegroundSet(COLOR_TEXT);
-			m_main_attack.colorSet(COLOR_KNOB);
-			m_main_attack.captionColorSet(COLOR_TEXT);
-			m_main_attack.entryBackgroundSet(COLOR_ENTRY);
-			m_main_attack.entryForegroundSet(COLOR_TEXT);
-			m_main_decay.colorSet(COLOR_KNOB);
-			m_main_decay.captionColorSet(COLOR_TEXT);
-			m_main_decay.entryBackgroundSet(COLOR_ENTRY);
-			m_main_decay.entryForegroundSet(COLOR_TEXT);
-			m_main_sustain.colorSet(COLOR_KNOB);
-			m_main_sustain.captionColorSet(COLOR_TEXT);
-			m_main_sustain.entryBackgroundSet(COLOR_ENTRY);
-			m_main_sustain.entryForegroundSet(COLOR_TEXT);
-			m_main_release.colorSet(COLOR_KNOB);
-			m_main_release.captionColorSet(COLOR_TEXT);
-			m_main_release.entryBackgroundSet(COLOR_ENTRY);
-			m_main_release.entryForegroundSet(COLOR_TEXT);
-			m_main_gain.colorSet(COLOR_KNOB);
-			m_main_gain.captionColorSet(COLOR_TEXT);
-			m_main_gain.entryBackgroundSet(COLOR_ENTRY);
-			m_main_gain.entryForegroundSet(COLOR_TEXT);
-			m_gate_attack.colorSet(COLOR_KNOB);
-			m_gate_attack.captionColorSet(COLOR_TEXT);
-			m_gate_attack.entryBackgroundSet(COLOR_ENTRY);
-			m_gate_attack.entryForegroundSet(COLOR_TEXT);
-			m_gate_decay.colorSet(COLOR_KNOB);
-			m_gate_decay.captionColorSet(COLOR_TEXT);
-			m_gate_decay.entryBackgroundSet(COLOR_ENTRY);
-			m_gate_decay.entryForegroundSet(COLOR_TEXT);
-			m_gate_sustain.colorSet(COLOR_KNOB);
-			m_gate_sustain.captionColorSet(COLOR_TEXT);
-			m_gate_sustain.entryBackgroundSet(COLOR_ENTRY);
-			m_gate_sustain.entryForegroundSet(COLOR_TEXT);
-			m_gate_release.colorSet(COLOR_KNOB);
-			m_gate_release.captionColorSet(COLOR_TEXT);
-			m_gate_release.entryBackgroundSet(COLOR_ENTRY);
-			m_gate_release.entryForegroundSet(COLOR_TEXT);
-			m_gate_depth.colorSet(COLOR_KNOB);
-			m_gate_depth.captionColorSet(COLOR_TEXT);
-			m_gate_depth.entryBackgroundSet(COLOR_ENTRY);
-			m_gate_depth.entryForegroundSet(COLOR_TEXT);
-
-			m_suboct.backgroundSet(COLOR_BG);
-			m_suboct.captionColorSet(COLOR_TEXT);
+			styleSet(m_voice);
+			styleSet(m_lfo);
+			styleSet(m_fc_env);
+			styleSet(m_fc_mix);
+			styleSet(m_main_env);
+			styleSet(m_gate);
+	
+			styleSet(m_detune);
+			styleSet(m_lfo_period);
+			styleSet(m_lfo_phase);
+			styleSet(m_filter_attack);
+			styleSet(m_filter_decay);
+			styleSet(m_filter_sustain);
+			styleSet(m_filter_release);
+			styleSet(m_filter_base);
+			styleSet(m_filter_lfo);
+			styleSet(m_filter_env);
+			styleSet(m_filter_keyb);
+			styleSet(m_filter_res);
+			styleSet(m_main_attack);
+			styleSet(m_main_decay);
+			styleSet(m_main_sustain);
+			styleSet(m_main_release);
+			styleSet(m_main_gain);
+			styleSet(m_gate_attack);
+			styleSet(m_gate_decay);
+			styleSet(m_gate_sustain);
+			styleSet(m_gate_release);
+			styleSet(m_gate_depth);
+	
+			styleSet(m_suboct);
 			}
 
 		~UIGtk()
@@ -263,6 +211,69 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 
 		void lfoPhaseUpdate(float value)
 			{m_lfo_phase.valueSet(value);}
+
+		
+		void filterAttackUpdate(float value)
+			{m_filter_attack.valueSet(value);}
+
+		void filterDecayUpdate(float value)
+			{m_filter_decay.valueSet(value);}
+
+		void filterSustainUpdate(float value)
+			{m_filter_sustain.valueSet(value);}
+
+		void filterReleaseUpdate(float value)
+			{m_filter_release.valueSet(value);}
+
+
+		void filterBaseUpdate(float value)
+			{m_filter_base.valueSet(value);}
+
+		void filterLFOUpdate(float value)
+			{m_filter_lfo.valueSet(value);}
+
+		void filterEnvUpdate(float value)
+			{m_filter_env.valueSet(value);}
+
+		void filterKeybUpdate(float value)
+			{m_filter_keyb.valueSet(value);}
+
+		void filterResUpdate(float value)
+			{m_filter_res.valueSet(value);}
+
+
+		void mainAttackUpdate(float value)
+			{m_main_attack.valueSet(value);}
+
+		void mainDecayUpdate(float value)
+			{m_main_decay.valueSet(value);}
+
+		void mainSustainUpdate(float value)
+			{m_main_sustain.valueSet(value);}
+
+		void mainReleaseUpdate(float value)
+			{m_main_release.valueSet(value);}
+
+
+		void gateAttackUpdate(float value)
+			{m_gate_attack.valueSet(value);}
+
+		void gateDecayUpdate(float value)
+			{m_gate_decay.valueSet(value);}
+
+		void gateSustainUpdate(float value)
+			{m_gate_sustain.valueSet(value);}
+
+		void gateReleaseUpdate(float value)
+			{m_gate_release.valueSet(value);}
+
+		void gateDepthUpdate(float value)
+			{m_gate_depth.valueSet(value);}
+
+
+		void mainGainUpdate(float value)
+			{m_main_gain.valueSet(value);}
+
 
 	private:
 		Box m_controls;
@@ -327,8 +338,93 @@ template<>
 void update<UIGtk::Ports::LFO_PHASE>(UIGtk& ui,float value)
 	{ui.lfoPhaseUpdate(value);}
 
+
+
+template<>
+void update<UIGtk::Ports::FILTER_ATTACK>(UIGtk& ui,float value)
+	{ui.filterAttackUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_DECAY>(UIGtk& ui,float value)
+	{ui.filterDecayUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_SUSTAIN>(UIGtk& ui,float value)
+	{ui.filterSustainUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_RELEASE>(UIGtk& ui,float value)
+	{ui.filterReleaseUpdate(value);}
+
+
+
+template<>
+void update<UIGtk::Ports::FILTER_BASE>(UIGtk& ui,float value)
+	{ui.filterBaseUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_LFO>(UIGtk& ui,float value)
+	{ui.filterLFOUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_ENVELOPE>(UIGtk& ui,float value)
+	{ui.filterEnvUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_KEYB>(UIGtk& ui,float value)
+	{ui.filterKeybUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::FILTER_RES>(UIGtk& ui,float value)
+	{ui.filterResUpdate(value);}
+
+
+
+template<>
+void update<UIGtk::Ports::MAIN_ATTACK>(UIGtk& ui,float value)
+	{ui.mainAttackUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::MAIN_DECAY>(UIGtk& ui,float value)
+	{ui.mainDecayUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::MAIN_SUSTAIN>(UIGtk& ui,float value)
+	{ui.mainSustainUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::MAIN_RELEASE>(UIGtk& ui,float value)
+	{ui.mainReleaseUpdate(value);}
+
+
+
+template<>
+void update<UIGtk::Ports::GATE_ATTACK>(UIGtk& ui,float value)
+	{ui.gateAttackUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::GATE_DECAY>(UIGtk& ui,float value)
+	{ui.gateDecayUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::GATE_SUSTAIN>(UIGtk& ui,float value)
+	{ui.gateSustainUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::GATE_RELEASE>(UIGtk& ui,float value)
+	{ui.gateReleaseUpdate(value);}
+
+template<>
+void update<UIGtk::Ports::GATE_DEPTH>(UIGtk& ui,float value)
+	{ui.gateDepthUpdate(value);}
+
+
+template<>
+void update<UIGtk::Ports::MAIN_GAIN>(UIGtk& ui,float value)
+	{ui.mainGainUpdate(value);}
+
+
+
 const LV2UI_Descriptor& LV2Plug::mainUI()
-	{
-	return LV2Plug::descriptorUiGet<UIGtk>();
-	}
+	{return LV2Plug::descriptorUiGet<UIGtk>();}
  

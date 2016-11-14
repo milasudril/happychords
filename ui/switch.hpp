@@ -44,18 +44,13 @@ namespace Happychords
 
 	template<class Paraminfo,class EventHandler
 		,std::enable_if_t< std::is_same<bool,typename Paraminfo::type_logical>::value ,int> n=0>
-	class PRIVATE Switch:private SwitchBase
+	class PRIVATE Switch:public SwitchBase
 		{
 		public:
 			Switch(Container& parent,EventHandler& handler):
 				SwitchBase(parent,Paraminfo::name(),SwitchBase::State::UP)
 				,m_handler(handler)
 				{}
-
-			using SwitchBase::stateGet;
-			using SwitchBase::stateSet;
-			using SwitchBase::backgroundSet;
-			using SwitchBase::captionColorSet;
 
 		private:
 			void changeEmmit() noexcept
