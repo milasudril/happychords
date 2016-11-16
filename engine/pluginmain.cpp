@@ -127,7 +127,11 @@ void Engine::processEvents() noexcept
 					break;
 
 				case LV2_MIDI_MSG_NOTE_OFF:
-					voices[ keys[ msg[1] ] ].stop(msg[1]);
+					{
+					auto voice=keys[ msg[1] ];
+					voices[ voice ].stop(msg[1]);
+					voice_current=voice;
+					}
 					break;
 				default:
 					break;
