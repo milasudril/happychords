@@ -1,12 +1,35 @@
-happychords
-===========
+Happychords2
+============
 
-This is a software synthesizer for producing hooks like the one found in "Rosa Hellikopter" and other fast-paced dance tracks. It can also produce rock organ sounds or sweeping pads.
+This is a rewrite of Happychords. Goals
 
-Dependencies
-------------
-* gabi
-* midiseq
-* synthmod
+ * Optimize the code
+ * Provide a Happy house themed UI. This is implemented in Gtk+2.0. Feel free to port it to whatever you want to use.
 
-The idea is to build a GUI using Windows API and use sockets + Wine for dealing with the UI. This makes it possible to control the plugin through network.
+Build requirements
+------------------
+
+Utilities:
+
+ * g++ 5 or later
+ * Maike
+ * Octave + image package
+ * Python3
+ * Blender
+ * LV2Plug Maike addon (see separate project)
+ * Inkscape
+
+
+Libraries:
+
+ * LV2Plug (see separate project)
+ * Gtk+-2.0 + dependencies
+
+
+Compiling
+---------
+Just run maike. It may take a while to bake the sprites depending on your computer.
+
+Installing
+----------
+Adapt  install.sh for your needs, and run it.
