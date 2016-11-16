@@ -12,7 +12,7 @@ Build requirements
 Utilities:
 
  * g++ 5 or later
- * Maike (you may also run the shell script build.sh)
+ * Maike
  * Octave + image package
  * Python3
  * Blender
