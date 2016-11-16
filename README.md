@@ -12,7 +12,7 @@ Build requirements
 Utilities:
 
  * g++ 5 or later
- * Maike
+ * Maike (you may also run the shell script build.sh)
  * Octave + image package
  * Python3
  * Blender
@@ -20,7 +20,7 @@ Utilities:
  * Inkscape
 
 
- Libraries:
+Libraries:
 
  * LV2Plug (see separate project)
  * Gtk+-2.0 + dependencies

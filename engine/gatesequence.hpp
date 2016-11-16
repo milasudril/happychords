@@ -52,6 +52,7 @@ namespace Happychords
 			static inline void from_string(const std::string& value,GateSequence::Event::Type& type);
 
 			size_t m_tpqn;
+			std::string m_name;
 			std::vector<Event> m_events;
 		};
 	}

@@ -23,6 +23,8 @@ void GateSequence::valueSet(const std::string& key,const std::string& value)
 	{
 	if(key=="tpqn")
 		{m_tpqn=stol(value);}
+	if(key=="name")
+		{m_name=value;}
 	}
 
 void GateSequence::from_string(const std::string& value,GateSequence::Event::Type& type)

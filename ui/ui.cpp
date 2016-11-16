@@ -152,7 +152,7 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 								,m_gate_sustain(m_gate_row,*this)
 								,m_gate_release(m_gate_row,*this)
 								,m_gate_depth(m_gate_row,*this)
-							,m_gate_pattern(m_gate_box,*this)
+						//	,m_gate_pattern(m_gate_box,*this)
 
 			{
 			styleSet(m_voice);
@@ -328,7 +328,7 @@ class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 							Knob< Port<Ports::GATE_SUSTAIN>,UIGtk> m_gate_sustain;
 							Knob< Port<Ports::GATE_RELEASE>,UIGtk> m_gate_release;
 							Knob< Port<Ports::GATE_DEPTH>,UIGtk> m_gate_depth;
-						Stringchoice< Port<Ports::GATE_PATTERN>,UIGtk> m_gate_pattern;
+					//	Stringchoice< Port<Ports::GATE_PATTERN>,UIGtk> m_gate_pattern;
 	};
 
 template<>

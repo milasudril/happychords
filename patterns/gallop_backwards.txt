@@ -7,7 +7,8 @@ tpqn: 8  # Use 8 ticks per quarter note
 # Notice the loop event at the end, which makes it
 # possible to end with a rest.
 #
-fields: time; type 
+fields: time; type
+name: "Gallop backwards"
 # Values are delimited by a tab, and must not end with any whitespace.
 data:
 0	note on

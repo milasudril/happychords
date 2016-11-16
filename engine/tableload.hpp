@@ -12,7 +12,7 @@ namespace Happychords
 	void tableLoad(File&& src,Header& header,Container& data)
 		{
 		int ch_in=0;
-		enum class State:int{HEADER_KEY,HEADER_VALUE,HEADER_FIELDS,COMMENT,DATA,RECORD};
+		enum class State:int{HEADER_KEY,HEADER_VALUE,HEADER_FIELDS,COMMENT,DATA,RECORD,STRING};
 		auto state_current=State::HEADER_KEY;
 		auto state_old=state_current;
 		std::string header_key;
@@ -65,6 +65,11 @@ namespace Happychords
 							header_key.clear();
 							header_value.clear();
 							break;
+
+						case '"':
+							state_old=state_current;
+							state_current=State::STRING;
+							break;
 						
 						default:
 							if(!(ch_in>=0 && ch_in<=' '))
@@ -83,6 +88,7 @@ namespace Happychords
 						case '\n':
 						case '\r':
 							fields.push_back(header_value);
+							header_value.clear();
 							state_current=State::HEADER_KEY;
 							break;
 						case ';':
@@ -149,6 +155,17 @@ namespace Happychords
 								{data.push_back(rec_current);}
 							header_value.clear();
 							field_count=0;
+							break;
+						default:
+							header_value+=ch_in;
+						}
+					break;
+
+				case State::STRING:
+					switch(ch_in)
+						{
+						case '"':
+							state_current=state_old;
 							break;
 						default:
 							header_value+=ch_in;
