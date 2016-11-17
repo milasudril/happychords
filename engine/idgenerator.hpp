@@ -25,6 +25,15 @@ namespace Happychords
 				return m_freelist.pop();
 				}
 
+			void fill() noexcept
+				{
+				while(m_id_next!=id_null - 1)
+					{
+					++m_id_next;
+					idRelease(m_id_next);
+					}
+				}
+
 			IdGenerator& idRelease(const typename Freelist::value_type& id)
 				{
 				m_freelist.push(id);

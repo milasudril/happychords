@@ -41,11 +41,10 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		Engine(double fs,const char* path_bundle
 			,LV2Plug::FeatureDescriptor&& features):m_features(features)
 			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_beat_old(0.0)
-			,voice_current(0)
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
 			,m_gate(m_gate_seq,m_tempo,fs)
-			{}
+			{voice_alloc.fill();}
 
 		void process(size_t n_frames) noexcept;
 
@@ -67,7 +66,6 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		float m_speed;
 		double m_beat_old;
 
-		size_t voice_current;
 		double lfo_freq;
 		FunctionGenerator<float,waveform_lfo.size()> LFO;
 		ArrayStatic<float,64> buffer_lfo;
