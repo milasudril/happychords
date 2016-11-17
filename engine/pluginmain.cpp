@@ -18,6 +18,8 @@
 #include "gatesequence.hpp"
 #include "gate.hpp"
 #include "../common/blob.hpp"
+#include "ringbuffer.hpp"
+#include "idgenerator.hpp"
 #include <lv2plug/lv2plug.hpp>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
 #include <cmath>
@@ -43,11 +45,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
 			,m_gate(m_gate_seq,m_tempo,fs)
-			{
-			char buffer[4096];
-			printf("%s\n",getcwd(buffer,4096));
-			fflush(stdout);
-			}
+			{}
 
 		void process(size_t n_frames) noexcept;
 
@@ -80,12 +78,14 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 		GateSequence m_gate_seq;
 		Gate m_gate;
 
-		ArrayStatic<int8_t,128> keys;
+		IdGenerator< RingBuffer<uint8_t,decltype(voices)::size()> > voice_alloc;
+		ArrayStatic<uint8_t,128> keys;
 
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;
 		void voiceActivate(int8_t key,float amplitude) noexcept;
 		void positionUpdate(const LV2_Atom_Object& obj) noexcept;
+		void voiceDeactivate(int8_t key) noexcept;
 		void lfoFreqUpdate() noexcept
 			{
 			lfo_freq=static_cast<double>(m_tempo)
@@ -100,11 +100,22 @@ static float frequencyGet(float key) noexcept
 
 void Engine::voiceActivate(int8_t key,float amplitude) noexcept
 	{
-	auto voice=voice_current%voices.size();
-	voices[voice_current%voices.size()].start(frequencyGet(key)/m_fs,amplitude
+	auto id=voice_alloc.idGet();
+	keys[key]=id;
+	if(id==voice_alloc.id_null)
+		{return;}
+	voices[id].start(frequencyGet(key)/m_fs,amplitude
 		,portmap().get<Ports::FILTER_KEYB>(),key);
-	++voice_current;
-	keys[key]=voice;
+	}
+
+void Engine::voiceDeactivate(int8_t key) noexcept
+	{
+	auto id=keys[key];
+	if(id==voice_alloc.id_null)
+		{return;}
+	voices[id].stop(key);
+	keys[key]=voice_alloc.id_null;
+	voice_alloc.idRelease(id);
 	}
 
 void Engine::processEvents() noexcept
@@ -127,11 +138,7 @@ void Engine::processEvents() noexcept
 					break;
 
 				case LV2_MIDI_MSG_NOTE_OFF:
-					{
-					auto voice=keys[ msg[1] ];
-					voices[ voice ].stop(msg[1]);
-					voice_current=voice;
-					}
+					voiceDeactivate(msg[1]);
 					break;
 				default:
 					break;
