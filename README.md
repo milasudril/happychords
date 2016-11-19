@@ -33,3 +33,10 @@ Just run maike. It may take a while to bake the sprites depending on your comput
 Installing
 ----------
 Adapt  install.sh for your needs, and run it.
+
+Demo
+----
+
+Here is a demo
+
+[![Demo](https://img.youtube.com/vi/TduNSSxQhEs/0.jpg)](https://www.youtube.com/watch?v=TduNSSxQhEs)
