@@ -1,7 +1,7 @@
 //@	{
 //@	"targets":
 //@		[{
-//@		 "name":"../happychords2-gtk.so","type":"lib_dynamic"
+//@		 "name":"../happychords-gtk.so","type":"lib_dynamic"
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug_ui","rel":"external"}

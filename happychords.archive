@@ -1,0 +1,14 @@
+{
+ "targets":
+	[{
+	 "name":"happychords.tar.gz","type":"tar","compressor":"gzip"
+	,"root":"happychords.lv2"
+	}]
+,"contents":
+	[
+	 {"from":"target","file":"happychords.so"}
+	,{"from":"target","file":"happychords-gtk.so"}
+	,{"from":"target","file":"manifest.ttl"}
+	,{"from":"source","file":"LICENSE"}
+	]
+}

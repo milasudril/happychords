@@ -1,11 +1,15 @@
 {
- "targets":[{"name":"plugindescriptor.hpp"}]
+ "targets":
+	[
+	 {"name":"plugindescriptor.hpp"}
+	,{"name":"manifest.ttl"}
+	]
 ,"specification":
 	{
 	 "name":"Happychords"
-	,"uri":"https://github.com/milasudril/happychords2"
+	,"uri":"https://github.com/milasudril/happychords"
 	,"type":"InstrumentPlugin"
-	,"binary":"happychords2.so"
+	,"binary":"happychords.so"
 	,"maintainer":"Milasudril"
 	,"license":"https://www.gnu.org/licenses/gpl-3.0.en.html"
 	
@@ -180,8 +184,8 @@
 
 	,"ui":
 		{
-		 "binary":"happychords2-gtk.so"
-		,"uri":"https://github.com/milasudril/happychords2#gtk"
+		 "binary":"happychords-gtk.so"
+		,"uri":"https://github.com/milasudril/happychords#gtk"
 		,"type":"Gtk"
 		}
 	}
