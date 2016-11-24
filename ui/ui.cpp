@@ -100,13 +100,26 @@ static void styleSet(Happychords::SwitchBase& sw)
 	sw.captionColorSet(COLOR_TEXT);
 	}
 
+namespace
+	{
+	struct Features
+		{
+		static constexpr const char* get(size_t k) noexcept
+			{return nullptr;}
+
+		static constexpr size_t size() noexcept
+			{return 0;}
+		};
+	}
+
 class PRIVATE UIGtk:public LV2Plug::PluginUI<PluginDescriptor>,private UIBase
 	{
 	public:
 		using UIBase::widgetGet;
+		typedef Features FeatureRequest;
 
 		UIGtk(const char* path_bundle,LV2Plug::UIController&& controller
-			,LV2Plug::FeatureDescriptor&& descriptor):Base(controller)
+			,LV2Plug::FeatureDescriptor<Features>&& descriptor):Base(controller)
 			,m_controls(*this,1)
 				,m_osc(m_controls.paddingSet(8),0)
 					,m_voice(m_osc.paddingSet(8),"Voice")

@@ -35,15 +35,45 @@ static constexpr auto waveform_lfo=Happychords::sine();
 
 BLOB(pattern_init,"patterns/gallop_backwards.txt");
 
+namespace
+	{
+	struct Features
+		{
+		static constexpr const char* content[]=
+			{
+			 LV2_MIDI__MidiEvent
+			,LV2_ATOM__Blank
+			,LV2_ATOM__Object
+			,LV2_TIME__Position
+			,LV2_TIME__beat
+			,LV2_TIME__barBeat
+			,LV2_TIME__beatsPerMinute
+			,LV2_TIME__beatsPerBar
+			,LV2_TIME__bar
+			,LV2_ATOM__Float
+			,LV2_ATOM__Long
+			,LV2_TIME__speed
+			};
+		static constexpr size_t size() noexcept
+			{return sizeof(content)/sizeof(const char*);}
+
+		static constexpr const char* get(size_t k) noexcept
+			{return content[k];}
+		};
+	constexpr const char* Features::content[];
+	}
+
 class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 	{
 	public:
+		typedef Features FeatureRequest;
+
 		Engine(double fs,const char* path_bundle
-			,LV2Plug::FeatureDescriptor&& features):m_features(features)
-			,m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_beat_old(0.0)
+			,LV2Plug::FeatureDescriptor<FeatureRequest>&& features):
+			 m_fs(fs),m_tempo(144.0),m_speed(0.0f),m_beat_old(0.0)
 			,m_gate_seq(reinterpret_cast<const int8_t*>(pattern_init_begin)
 				,reinterpret_cast<const int8_t*>(pattern_init_end))
-			,m_gate(m_gate_seq,m_tempo,fs)
+			,m_gate(m_gate_seq,m_tempo,fs),m_features(features)
 			{voice_alloc.fill();}
 
 		void process(size_t n_frames) noexcept;
@@ -60,7 +90,6 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 			{free(pointer);}
 
 	private:
-		LV2Plug::FeatureDescriptor m_features;
 		double m_fs;
 		float m_tempo;
 		float m_speed;
@@ -78,6 +107,7 @@ class PRIVATE Engine:public LV2Plug::Plugin<PluginDescriptor>
 
 		IdGenerator< RingBuffer<uint8_t,decltype(voices)::size()> > voice_alloc;
 		ArrayStatic<uint8_t,128> keys;
+		LV2Plug::FeatureDescriptor<FeatureRequest> m_features;
 
 		void generate(size_t n_frames) noexcept;
 		void processEvents() noexcept;
@@ -126,7 +156,7 @@ void Engine::processEvents() noexcept
 	while(!lv2_atom_sequence_is_end(&(midi_in->body)
 		,midi_in->atom.size,ev))
 		{
-		if(ev->body.type==m_features.midi())
+		if(ev->body.type==m_features.get<LV2Plug::make_key(LV2_MIDI__MidiEvent)>())
 			{
 			const uint8_t* const msg=(const uint8_t*)(ev + 1);
 			switch(lv2_midi_message_type(msg))
@@ -143,11 +173,11 @@ void Engine::processEvents() noexcept
 				}
 			}
 		else
-		if(ev->body.type==m_features.AtomBlank()
-			|| ev->body.type==m_features.AtomObject())
+		if(ev->body.type==m_features.get<LV2Plug::make_key(LV2_ATOM__Blank)>()
+			|| ev->body.type==m_features.get<LV2Plug::make_key(LV2_ATOM__Object)>())
 			{
 			auto obj=reinterpret_cast<const LV2_Atom_Object*>(&ev->body);
-			if(obj->body.otype==m_features.position())
+			if(obj->body.otype==m_features.get<LV2Plug::make_key(LV2_TIME__Position)>())
 				{positionUpdate(*obj);}
 			}
 		ev=lv2_atom_sequence_next(ev);
@@ -173,22 +203,20 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 	{
 	LV2_Atom* bpm=nullptr;
 	LV2_Atom* speed=nullptr;
-	LV2_Atom* frame=nullptr;
 	LV2_Atom* bar=nullptr;
 	LV2_Atom* barbeat=nullptr;
 	LV2_Atom* beatsperbar=nullptr;
 
 	lv2_atom_object_get(&obj
-		,m_features.beatsPerMinute(),&bpm
-		,m_features.speed(),&speed
-		,m_features.frame(),&frame
-		,m_features.bar(),&bar
-		,m_features.barBeat(),&barbeat
-		,m_features.beatsPerBar(),&beatsperbar
+		,m_features.get<LV2Plug::make_key(LV2_TIME__beatsPerMinute)>(),&bpm
+		,m_features.get<LV2Plug::make_key(LV2_TIME__speed)>(),&speed
+		,m_features.get<LV2Plug::make_key(LV2_TIME__bar)>(),&bar
+		,m_features.get<LV2Plug::make_key(LV2_TIME__barBeat)>(),&barbeat
+		,m_features.get<LV2Plug::make_key(LV2_TIME__beatsPerBar)>(),&beatsperbar
 		,NULL);
 	
 	auto speed_val=1.0f;
-	if(speed && speed->type==m_features.Float())
+	if(speed && speed->type==m_features.get<LV2Plug::make_key(LV2_ATOM__Float)>())
 		{
 		auto temp=reinterpret_cast<const LV2_Atom_Float*>(speed);
 		static_assert(std::is_same<decltype(temp->body),decltype(m_tempo)>::value
@@ -196,7 +224,7 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 		speed_val=temp->body;
 		}
 
-	if(bpm && bpm->type==m_features.Float())
+	if(bpm && bpm->type==m_features.get<LV2Plug::make_key(LV2_ATOM__Float)>())
 		{
 		auto temp=reinterpret_cast<const LV2_Atom_Float*>(bpm);
 		auto tempo=temp->body;
@@ -210,9 +238,9 @@ void Engine::positionUpdate(const LV2_Atom_Object& obj) noexcept
 			}
 		}
 
-	if(barbeat && barbeat->type==m_features.Float()
-		&& bar && bar->type==m_features.Long()
-		&& beatsperbar && beatsperbar->type==m_features.Float())
+	if(barbeat && barbeat->type==m_features.get<LV2Plug::make_key(LV2_ATOM__Float)>()
+		&& bar && bar->type==m_features.get<LV2Plug::make_key(LV2_ATOM__Long)>()
+		&& beatsperbar && beatsperbar->type==m_features.get<LV2Plug::make_key(LV2_ATOM__Float)>())
 		{
 
 		auto beatval=reinterpret_cast<const LV2_Atom_Float*>(barbeat);
