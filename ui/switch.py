@@ -1,10 +1,10 @@
 #@  {
 #@  "targets":
 #@      [
-#@           {"name":"switch-down-background.png","dependencies":[]}
-#@          ,{"name":"switch-down-light.png","dependencies":[]}
-#@          ,{"name":"switch-up-background.png","dependencies":[]}
-#@          ,{"name":"switch-up-light.png","dependencies":[]}
+#@           {"name":"switch-down-background.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
+#@          ,{"name":"switch-down-light.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
+#@          ,{"name":"switch-up-background.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
+#@          ,{"name":"switch-up-light.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
 #@      ]
 #@  }
 
@@ -12,34 +12,21 @@ import subprocess
 import sys
 import os
 
+
 def write_error(*args, **kwargs):
     print(*args,file=sys.stderr,**kwargs)
-
-def newer(file_a,file_b):
-	if not os.path.exists(file_a):
-		return 0
-	if not os.path.exists(file_b):
-		return 1
-	stata=os.stat(file_a)
-	statb=os.stat(file_b)
-	if stata.st_mtime > statb.st_mtime:
-		return 1
-	return 0
-
+	
 try:
 	target_dir=sys.argv[1]
 	in_dir=sys.argv[2]
-
-	if ( newer(target_dir+'/'+in_dir+'/switch-down-background.png',in_dir+'/switch.blend')
-		and newer(target_dir+'/'+in_dir+'/switch-down-light.png',in_dir+'/switch.blend')
-		and newer(target_dir+'/'+in_dir+'/switch-up-background.png',in_dir+'/switch.blend') 
-		and newer(target_dir+'/'+in_dir+'/switch-up-light.png',in_dir+'/switch.blend')):
-		exit(0)
-	print('Baking switch sprites')
-
-	subprocess.run(['blender','-b',in_dir+'/switch.blend' \
+	print('# Baking switch sprite')
+	blender=subprocess.Popen(['blender','-b',in_dir+'/switch.blend' \
 		,'-s','2','-e','5','-o',target_dir+'/'+in_dir+'/switch_#.png','-a'] \
-		,stdout=subprocess.DEVNULL)
+		,stdout=subprocess.PIPE)
+	for lines in blender.stdout:
+		progress=lines.decode('utf8').rstrip().split('|')
+		print('# Blender:%s'%(progress[-1]))
+		sys.stdout.flush()
 
 	subprocess.run(['composite','-compose','subtract',target_dir+'/'+in_dir+'/switch_2.png' \
 		,target_dir+'/'+in_dir+'/switch_3.png',target_dir+'/'+in_dir+'/switch-down-background.png'])
