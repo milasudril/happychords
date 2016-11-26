@@ -1,0 +1,455 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:misc
+LIBS:schematics-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 6
+Title "Happychords"
+Date "2016-11-26"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Wavesource U14
+U 1 1 58396783
+P 5200 5350
+AR Path="/584EE174/584F40A6/58396783" Ref="U14"  Part="1" 
+AR Path="/584EE174/584F40FF/58396783" Ref="U23"  Part="1" 
+AR Path="/584EE174/584F4158/58396783" Ref="U32"  Part="1" 
+AR Path="/584EE174/584F41AA/58396783" Ref="U41"  Part="1" 
+F 0 "U32" H 5200 5350 60  0000 C CNN
+F 1 "Wavesource" H 5200 5250 60  0001 C BNN
+F 2 "" H 5200 5250 60  0000 C CNN
+F 3 "" H 5200 5250 60  0000 C CNN
+	1    5200 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mult U18
+U 1 1 5839678A
+P 7750 5050
+AR Path="/584EE174/584F40A6/5839678A" Ref="U18"  Part="1" 
+AR Path="/584EE174/584F40FF/5839678A" Ref="U27"  Part="1" 
+AR Path="/584EE174/584F4158/5839678A" Ref="U36"  Part="1" 
+AR Path="/584EE174/584F41AA/5839678A" Ref="U45"  Part="1" 
+F 0 "U36" H 7750 5050 60  0000 C CNN
+F 1 "Mult" H 8000 4800 60  0000 R TNN
+F 2 "" H 8000 4800 60  0000 C CNN
+F 3 "" H 8000 4800 60  0000 C CNN
+	1    7750 5050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mult U12
+U 1 1 58396791
+P 4750 3950
+AR Path="/584EE174/584F40A6/58396791" Ref="U12"  Part="1" 
+AR Path="/584EE174/584F40FF/58396791" Ref="U21"  Part="1" 
+AR Path="/584EE174/584F4158/58396791" Ref="U30"  Part="1" 
+AR Path="/584EE174/584F41AA/58396791" Ref="U39"  Part="1" 
+F 0 "U30" H 4750 3950 60  0000 C CNN
+F 1 "Mult" H 5000 3700 60  0000 R TNN
+F 2 "" H 5000 3700 60  0000 C CNN
+F 3 "" H 5000 3700 60  0000 C CNN
+	1    4750 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mult U13
+U 1 1 58396798
+P 4750 4550
+AR Path="/584EE174/584F40A6/58396798" Ref="U13"  Part="1" 
+AR Path="/584EE174/584F40FF/58396798" Ref="U22"  Part="1" 
+AR Path="/584EE174/584F4158/58396798" Ref="U31"  Part="1" 
+AR Path="/584EE174/584F41AA/58396798" Ref="U40"  Part="1" 
+F 0 "U31" H 4750 4550 60  0000 C CNN
+F 1 "Mult" H 5000 4300 60  0000 R TNN
+F 2 "" H 5000 4300 60  0000 C CNN
+F 3 "" H 5000 4300 60  0000 C CNN
+	1    4750 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L ADSR U10
+U 1 1 5839679F
+P 3750 4050
+AR Path="/584EE174/584F40A6/5839679F" Ref="U10"  Part="1" 
+AR Path="/584EE174/584F40FF/5839679F" Ref="U19"  Part="1" 
+AR Path="/584EE174/584F4158/5839679F" Ref="U28"  Part="1" 
+AR Path="/584EE174/584F41AA/5839679F" Ref="U37"  Part="1" 
+F 0 "U28" H 3750 4050 60  0000 C CNN
+F 1 "ADSR" H 4000 3800 60  0000 R TNN
+F 2 "" H 3750 3900 60  0000 C CNN
+F 3 "" H 3750 3900 60  0000 C CNN
+	1    3750 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L ADSR U17
+U 1 1 583967A6
+P 6850 4650
+AR Path="/584EE174/584F40A6/583967A6" Ref="U17"  Part="1" 
+AR Path="/584EE174/584F40FF/583967A6" Ref="U26"  Part="1" 
+AR Path="/584EE174/584F4158/583967A6" Ref="U35"  Part="1" 
+AR Path="/584EE174/584F41AA/583967A6" Ref="U44"  Part="1" 
+F 0 "U35" H 6850 4650 60  0000 C CNN
+F 1 "ADSR" H 7100 4400 60  0000 R TNN
+F 2 "" H 6850 4500 60  0000 C CNN
+F 3 "" H 6850 4500 60  0000 C CNN
+	1    6850 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Filter U16
+U 1 1 583967AD
+P 6400 5350
+AR Path="/584EE174/584F40A6/583967AD" Ref="U16"  Part="1" 
+AR Path="/584EE174/584F40FF/583967AD" Ref="U25"  Part="1" 
+AR Path="/584EE174/584F4158/583967AD" Ref="U34"  Part="1" 
+AR Path="/584EE174/584F41AA/583967AD" Ref="U43"  Part="1" 
+F 0 "U34" H 6400 5350 60  0000 C CNN
+F 1 "Filter" H 6650 5100 60  0000 R TNN
+F 2 "" H 6650 5100 60  0000 C CNN
+F 3 "" H 6650 5100 60  0000 C CNN
+	1    6400 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mult U11
+U 1 1 583967B4
+P 4750 3350
+AR Path="/584EE174/584F40A6/583967B4" Ref="U11"  Part="1" 
+AR Path="/584EE174/584F40FF/583967B4" Ref="U20"  Part="1" 
+AR Path="/584EE174/584F4158/583967B4" Ref="U29"  Part="1" 
+AR Path="/584EE174/584F41AA/583967B4" Ref="U38"  Part="1" 
+F 0 "U29" H 4750 3350 60  0000 C CNN
+F 1 "Mult" H 5000 3100 60  0000 R TNN
+F 2 "" H 5000 3100 60  0000 C CNN
+F 3 "" H 5000 3100 60  0000 C CNN
+	1    4750 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Add U15
+U 1 1 583967BB
+P 5850 3900
+AR Path="/584EE174/584F40A6/583967BB" Ref="U15"  Part="1" 
+AR Path="/584EE174/584F40FF/583967BB" Ref="U24"  Part="1" 
+AR Path="/584EE174/584F4158/583967BB" Ref="U33"  Part="1" 
+AR Path="/584EE174/584F41AA/583967BB" Ref="U42"  Part="1" 
+F 0 "U33" H 5850 3900 60  0000 C CNN
+F 1 "Add" H 6100 3650 60  0000 R TNN
+F 2 "" H 6100 3650 60  0000 C CNN
+F 3 "" H 6100 3650 60  0000 C CNN
+	1    5850 3900
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X04 P11
+U 1 1 583967EF
+P 2700 5250
+AR Path="/584EE174/584F40A6/583967EF" Ref="P11"  Part="1" 
+AR Path="/584EE174/584F40FF/583967EF" Ref="P14"  Part="1" 
+AR Path="/584EE174/584F4158/583967EF" Ref="P17"  Part="1" 
+AR Path="/584EE174/584F41AA/583967EF" Ref="P20"  Part="1" 
+F 0 "P17" H 2700 5500 50  0000 C CNN
+F 1 "voice_ctrl" V 2800 5250 50  0000 C CNN
+F 2 "" H 2700 5250 50  0000 C CNN
+F 3 "" H 2700 5250 50  0000 C CNN
+	1    2700 5250
+	-1   0    0    -1  
+$EndComp
+$Comp
+L CONN_01X01 P13
+U 1 1 583967F7
+P 8500 5050
+AR Path="/584EE174/584F40A6/583967F7" Ref="P13"  Part="1" 
+AR Path="/584EE174/584F40FF/583967F7" Ref="P16"  Part="1" 
+AR Path="/584EE174/584F4158/583967F7" Ref="P19"  Part="1" 
+AR Path="/584EE174/584F41AA/583967F7" Ref="P22"  Part="1" 
+F 0 "P19" H 8500 5150 50  0000 C CNN
+F 1 "bufftemp_0" V 8600 5050 50  0000 C CNN
+F 2 "" H 8500 5050 50  0000 C CNN
+F 3 "" H 8500 5050 50  0000 C CNN
+	1    8500 5050
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X15 P12
+U 1 1 583967FF
+P 5350 1450
+AR Path="/584EE174/584F40A6/583967FF" Ref="P12"  Part="1" 
+AR Path="/584EE174/584F40FF/583967FF" Ref="P15"  Part="1" 
+AR Path="/584EE174/584F4158/583967FF" Ref="P18"  Part="1" 
+AR Path="/584EE174/584F41AA/583967FF" Ref="P21"  Part="1" 
+F 0 "P18" H 5350 2250 50  0000 C CNN
+F 1 "voice_params" V 5450 1450 50  0000 C CNN
+F 2 "" H 5350 1450 50  0000 C CNN
+F 3 "" H 5350 1450 50  0000 C CNN
+	1    5350 1450
+	0    -1   -1   0   
+$EndComp
+Text HLabel 8450 4600 2    60   Output ~ 0
+buffer_0
+Text HLabel 2850 4550 0    60   Input ~ 0
+LFO
+Text HLabel 2850 4650 0    60   Input ~ 0
+Trig
+Text HLabel 2850 4750 0    60   Input ~ 0
+f
+Text HLabel 2850 4850 0    60   Input ~ 0
+a
+Text HLabel 3600 1950 1    60   Input ~ 0
+FILTER_ATTACK
+Text HLabel 3700 1950 1    60   Input ~ 0
+FILTER_DECAY
+Text HLabel 3800 1950 1    60   Input ~ 0
+FILTER_SUSTAIN
+Text HLabel 3900 1950 1    60   Input ~ 0
+FILTER_RELEASE
+Text HLabel 4300 1950 1    60   Input ~ 0
+FILTER_LFO
+Text HLabel 4200 1950 1    60   Input ~ 0
+FILTER_ENVELOPE
+Text HLabel 4100 1950 1    60   Input ~ 0
+FILTER_KEYB
+Text HLabel 5000 2800 0    60   Input ~ 0
+VOICE_DETUNE
+Text HLabel 5000 2900 0    60   Input ~ 0
+VOICE_SUBOCT
+Text HLabel 5000 3000 0    60   Input ~ 0
+FILTER_BASE
+Text HLabel 6500 1950 1    60   Input ~ 0
+FILTER_RES
+Text HLabel 6700 1950 1    60   Input ~ 0
+MAIN_ATTACK
+Text HLabel 6800 1950 1    60   Input ~ 0
+MAIN_DECAY
+Text HLabel 6900 1950 1    60   Input ~ 0
+MAIN_SUSTAIN
+Text HLabel 7000 1950 1    60   Input ~ 0
+MAIN_RELEASE
+Wire Wire Line
+	5200 4550 5200 4050
+Wire Wire Line
+	3300 4050 3300 5200
+Wire Wire Line
+	4100 5300 2900 5300
+Wire Wire Line
+	4100 4650 4100 5300
+Wire Wire Line
+	2900 5400 4100 5400
+Wire Wire Line
+	4100 5400 4100 5450
+Connection ~ 3300 4900
+Wire Wire Line
+	3300 4900 5750 4900
+Wire Wire Line
+	5750 4900 5750 4650
+Wire Wire Line
+	5750 4650 6400 4650
+Wire Wire Line
+	5200 3350 5200 3850
+Wire Wire Line
+	5200 3850 5400 3850
+Wire Wire Line
+	5200 3950 5400 3950
+Wire Wire Line
+	5200 4050 5400 4050
+Wire Wire Line
+	5650 5350 5950 5350
+Wire Wire Line
+	3300 5200 2900 5200
+Wire Wire Line
+	3600 1950 3600 3650
+Wire Wire Line
+	3700 1950 3700 3650
+Wire Wire Line
+	3800 1950 3800 3650
+Wire Wire Line
+	3900 1950 3900 3650
+Wire Wire Line
+	4100 1950 4100 4450
+Wire Wire Line
+	4200 1950 4200 3850
+Wire Wire Line
+	4100 4450 4300 4450
+Wire Wire Line
+	4200 4050 4300 4050
+Wire Wire Line
+	4200 3850 4300 3850
+Wire Wire Line
+	4300 3450 3200 3450
+Wire Wire Line
+	3200 3450 3200 5100
+Wire Wire Line
+	5400 3000 5400 3750
+Wire Wire Line
+	5100 2800 5100 4950
+Wire Wire Line
+	5300 2900 5300 4950
+Wire Wire Line
+	6300 4950 6300 3900
+Wire Wire Line
+	6500 1950 6500 4950
+Wire Wire Line
+	6700 1950 6700 4250
+Wire Wire Line
+	6800 1950 6800 4250
+Wire Wire Line
+	6900 1950 6900 4250
+Wire Wire Line
+	7000 1950 7000 4250
+Wire Wire Line
+	7300 4950 7300 4650
+Wire Wire Line
+	6850 5350 7000 5350
+Wire Wire Line
+	7000 5350 7000 5150
+Wire Wire Line
+	7000 5150 7300 5150
+Wire Wire Line
+	4100 5250 4750 5250
+Wire Wire Line
+	4100 5450 4750 5450
+Connection ~ 3300 4650
+Wire Wire Line
+	3200 5100 2900 5100
+Wire Wire Line
+	8200 5050 8300 5050
+Wire Wire Line
+	5000 2900 5450 2900
+Wire Wire Line
+	5450 2900 5450 1650
+Wire Wire Line
+	5000 3000 5550 3000
+Wire Wire Line
+	5550 3000 5550 1650
+Wire Wire Line
+	6500 3000 5650 3000
+Wire Wire Line
+	5650 3000 5650 1650
+Wire Wire Line
+	6700 2900 5750 2900
+Wire Wire Line
+	5750 2900 5750 1650
+Wire Wire Line
+	6800 2800 5850 2800
+Wire Wire Line
+	5850 2800 5850 1650
+Wire Wire Line
+	6900 2700 5950 2700
+Wire Wire Line
+	5950 2700 5950 1650
+Wire Wire Line
+	7000 2600 6050 2600
+Wire Wire Line
+	6050 2600 6050 1650
+Wire Wire Line
+	5000 2800 5350 2800
+Wire Wire Line
+	5350 2800 5350 1650
+Wire Wire Line
+	4300 2700 5250 2700
+Wire Wire Line
+	5250 2700 5250 1650
+Wire Wire Line
+	4200 2600 5150 2600
+Wire Wire Line
+	5150 2600 5150 1650
+Wire Wire Line
+	4100 2500 5050 2500
+Wire Wire Line
+	5050 2500 5050 1650
+Wire Wire Line
+	3900 2400 4950 2400
+Wire Wire Line
+	4950 2400 4950 1650
+Wire Wire Line
+	3800 2300 4850 2300
+Wire Wire Line
+	4850 2300 4850 1650
+Wire Wire Line
+	3700 2200 4750 2200
+Wire Wire Line
+	4750 2200 4750 1650
+Wire Wire Line
+	3600 2100 4650 2100
+Wire Wire Line
+	4650 2100 4650 1650
+Wire Wire Line
+	8250 5050 8250 4600
+Wire Wire Line
+	8250 4600 8450 4600
+Connection ~ 8250 5050
+Wire Wire Line
+	2850 4550 3200 4550
+Connection ~ 3200 4550
+Wire Wire Line
+	2850 4750 3100 4750
+Wire Wire Line
+	3100 4750 3100 5300
+Connection ~ 3100 5300
+Wire Wire Line
+	2850 4850 3000 4850
+Wire Wire Line
+	3000 4850 3000 5400
+Wire Wire Line
+	2850 4650 3300 4650
+Wire Wire Line
+	4100 4650 4300 4650
+Connection ~ 4100 5250
+Connection ~ 3600 2100
+Connection ~ 3700 2200
+Connection ~ 3800 2300
+Connection ~ 3900 2400
+Connection ~ 4100 2500
+Connection ~ 4200 2600
+Wire Wire Line
+	4300 1950 4300 3250
+Connection ~ 4300 2700
+Connection ~ 5100 2800
+Connection ~ 5300 2900
+Connection ~ 3000 5400
+Connection ~ 5400 3000
+Connection ~ 7000 2600
+Connection ~ 6900 2700
+Connection ~ 6800 2800
+Connection ~ 6700 2900
+Connection ~ 6500 3000
+$EndSCHEMATC
