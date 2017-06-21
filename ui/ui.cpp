@@ -5,7 +5,7 @@
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug_ui","rel":"external"}
-//@				,{"ref":"background.png","rel":"generated"}
+//@				,{"ref":"background.png","rel":"misc"}
 //@			]
 //@		,"pkgconfig_libs":["gtk+-2.0"]
 //@		}]

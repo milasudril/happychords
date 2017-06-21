@@ -4,9 +4,9 @@
 //@		 "name":"knob.o","type":"object"
 //@		,"dependencies":
 //@			[
-//@				 {"ref":"knob-shadow.png","rel":"generated"}
-//@				,{"ref":"knob-mask.png","rel":"generated"}
-//@				,{"ref":"knob-specular.png","rel":"generated"}
+//@				 {"ref":"knob-shadow.png","rel":"misc"}
+//@				,{"ref":"knob-mask.png","rel":"misc"}
+//@				,{"ref":"knob-specular.png","rel":"misc"}
 //@			]
 //@		,"pkgconfig_libs":["gtk+-2.0"]
 //@		}]

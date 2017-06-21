@@ -5,8 +5,8 @@
 #@			 "name":"background.png"
 #@			,"dependencies":
 #@				[
-#@					 {"ref":"star.svg","rel":"file"}
-#@					,{"ref":"genpattern.m","rel":"file"}
+#@					 {"ref":"star.svg","rel":"misc"}
+#@					,{"ref":"genpattern.m","rel":"misc"}
 #@				]
 #@			}
 #@      ]

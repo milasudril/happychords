@@ -5,7 +5,7 @@
 //@		,"dependencies":
 //@			[
 //@				 {"ref":"lv2plug","rel":"external"}
-//@				,{"ref":"../patterns/gallop_backwards.txt","rel":"file"}
+//@				,{"ref":"../patterns/gallop_backwards.txt","rel":"misc"}
 //@			]
 //@		}]
 //@	}

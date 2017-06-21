@@ -4,10 +4,10 @@
 //@		 "name":"switch.o","type":"object"
 //@		,"dependencies":
 //@			[
-//@           {"ref":"switch-down-background.png","rel":"generated"}
-//@          ,{"ref":"switch-down-light.png","rel":"generated"}
-//@          ,{"ref":"switch-up-background.png","rel":"generated"}
-//@          ,{"ref":"switch-up-light.png","rel":"generated"}
+//@           {"ref":"switch-down-background.png","rel":"misc"}
+//@          ,{"ref":"switch-down-light.png","rel":"misc"}
+//@          ,{"ref":"switch-up-background.png","rel":"misc"}
+//@          ,{"ref":"switch-up-light.png","rel":"misc"}
 //@			]
 //@		,"pkgconfig_libs":["gtk+-2.0"]
 //@		}]

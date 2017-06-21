@@ -1,9 +1,9 @@
 #@  {
 #@  "targets":
 #@      [
-#@           {"name":"knob-mask.png","dependencies":[{"ref":"knob.blend","rel":"file"}]}
-#@          ,{"name":"knob-shadow.png","dependencies":[{"ref":"knob.blend","rel":"file"}]}
-#@          ,{"name":"knob-specular.png","dependencies":[{"ref":"knob.blend","rel":"file"}]}
+#@           {"name":"knob-mask.png","dependencies":[{"ref":"knob.blend","rel":"misc"}]}
+#@          ,{"name":"knob-shadow.png","dependencies":[{"ref":"knob.blend","rel":"misc"}]}
+#@          ,{"name":"knob-specular.png","dependencies":[{"ref":"knob.blend","rel":"misc"}]}
 #@      ]
 #@  }
 

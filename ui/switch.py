@@ -1,10 +1,10 @@
 #@  {
 #@  "targets":
 #@      [
-#@           {"name":"switch-down-background.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
-#@          ,{"name":"switch-down-light.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
-#@          ,{"name":"switch-up-background.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
-#@          ,{"name":"switch-up-light.png","dependencies":[{"ref":"switch.blend","rel":"file"}]}
+#@           {"name":"switch-down-background.png","dependencies":[{"ref":"switch.blend","rel":"misc"}]}
+#@          ,{"name":"switch-down-light.png","dependencies":[{"ref":"switch.blend","rel":"misc"}]}
+#@          ,{"name":"switch-up-background.png","dependencies":[{"ref":"switch.blend","rel":"misc"}]}
+#@          ,{"name":"switch-up-light.png","dependencies":[{"ref":"switch.blend","rel":"misc"}]}
 #@      ]
 #@  }
 
