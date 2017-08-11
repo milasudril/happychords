@@ -307,9 +307,13 @@ void Engine::generate(size_t n_frames) noexcept
 		,portmap().get<Ports::GATE_RELEASE>());
 
 	memset(bufftemp[2].begin(),0,sizeof(bufftemp)/bufftemp.size());
-	while(n_frames!=0)
+	while(n_frames>=2)
 		{
-		auto n=std::min(n_frames,buffer_in.size());
+		auto n=(std::min(buffer_in.size(),n_frames)>>1) << 1;
+		assert((n%2)==0);
+		assert(n<=n_frames);
+		assert(n>0);
+	
 		LFO.generate(lfo_freq,1.0f,lfo_phase,waveform_lfo,buffer_lfo.begin(),n);
 		std::transform(buffer_lfo.begin(),buffer_lfo.end(),buffer_lfo.begin()
 			,[filter_lfo](float x)
@@ -338,12 +342,14 @@ void Engine::generate(size_t n_frames) noexcept
 			,[main_gain](Framepair x)
 				{return main_gain*x;}
 			);
+
 		demux(bufftemp[1].begin(),buffer_l,buffer_r,n);
-
-
 		n_frames-=n;
 		buffer_l+=n;
 		buffer_r+=n;
+		
+		if(n_frames==1)
+			{break;}
 		}
 	}
 

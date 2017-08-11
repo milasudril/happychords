@@ -3,10 +3,10 @@
         "paths_full_reject":[],
         "paths_reject":[
             "..",
+            ".git",
             ".",
-			".git",
-            "__targets",
-			"__targets_rel"
+            "__targets_rel",
+            "__targets"
         ],
         "recursive":1
     },
@@ -18,8 +18,9 @@
             "config":{
                 "appcompile":{
                     "args":[
-                        "-O2",
+                        "-O3",
                         "-fpic",
+                        "-ffast-math",
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
@@ -27,7 +28,7 @@
                         "{includedir}",
                         "-DMAIKE_TARGET_DIRECTORY={target_directory}",
                         "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
-						"-s",
+                        "-s",
                         "-o",
                         "{target}",
                         "{source}",
@@ -36,14 +37,17 @@
                     ],
                     "name":"g++"
                 },
-                "cflags_extra":["march=native"],
+                "cflags_extra":[
+                    "march=native"
+                ],
                 "cflags_format":"-^",
                 "cxxversion_max":-1,
                 "cxxversion_min":201402,
                 "dllcompile":{
                     "args":[
-                        "-O2",
+                        "-O3",
                         "-fpic",
+                        "-ffast-math",
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
@@ -52,7 +56,7 @@
                         "-DMAIKE_TARGET_DIRECTORY={target_directory}",
                         "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
                         "-shared",
-						"-s",
+                        "-s",
                         "-o",
                         "{target}",
                         "{source}",
@@ -61,6 +65,7 @@
                     ],
                     "name":"g++"
                 },
+                "include_format":"",
                 "includedir":[],
                 "includedir_format":"-I^",
                 "includedir_noscan":[],
@@ -83,8 +88,9 @@
                 "objcompile":{
                     "args":[
                         "-c",
-                        "-O2",
+                        "-O3",
                         "-fpic",
+                        "-ffast-math",
                         "{cxxversion}",
                         "-Wall",
                         "{cflags_extra}",
@@ -133,6 +139,75 @@
         },
         {
             "config":{
+                "tar":{
+                    "command":{
+                        "args":[
+                            "{target_strip}",
+                            "{root_append}",
+                            "{compressor}",
+                            "-cf",
+                            "{target}",
+                            "-T",
+                            "-"
+                        ],
+                        "name":"tar"
+                    },
+                    "compressors":{
+                        "bzip2":"-j",
+                        "gzip":"-z",
+                        "lzma":"-J"
+                    },
+                    "root_append":"--transform=s,\\\\(.*\\\\),^\\\\1,g",
+                    "target_strip":"--transform=s,\\^^,,g"
+                },
+                "zip":{
+                    "create":{
+                        "args":[
+                            "-@",
+                            "{target}"
+                        ],
+                        "name":"zip"
+                    },
+                    "rename":{
+                        "args":[
+                            "-w",
+                            "{target}"
+                        ],
+                        "name":"zipnote"
+                    }
+                }
+            },
+            "filename_exts":[
+                ".archive"
+            ],
+            "name":"targetarchive_default",
+            "plugin":"targetarchive"
+        },
+        {
+            "config":{
+                "tohopper":{
+                    "args":[
+                        "{source}",
+                        "{target_directory}"
+                    ],
+                    "name":"lv2spectohpp.php"
+                },
+                "tottler":{
+                    "args":[
+                        "{source}",
+                        "{target_directory}"
+                    ],
+                    "name":"lv2spectottl.php"
+                }
+            },
+            "filename_exts":[
+                ".lv2spec"
+            ],
+            "name":"lv2specdefault",
+            "plugin":"targetlv2spec"
+        },
+        {
+            "config":{
                 "command":{
                     "args":[
                         "--",
@@ -147,32 +222,10 @@
             ],
             "name":"pythondefault",
             "plugin":"targetpython"
-        },
-		{
-			"config": {
-				"tohopper": {
-					"args": [
-						"{source}",
-						"{target_directory}"
-					],
-					"name": "lv2spectohpp.php"
-				},
-				"tottler": {
-					"args": [
-						"{source}",
-						"{target_directory}"
-					],
-					"name": "lv2spectottl.php"
-				}
-			},
-			"filename_exts": [
-				".lv2spec"
-			],
-			"name": "lv2specdefault",
-			"plugin": "targetlv2spec"
-		}
+        }
     ],
     "targetinfo":{
-        "target_directory":"__targets"
+        "project_root":"",
+        "target_directory":"__targets_rel"
     }
 }

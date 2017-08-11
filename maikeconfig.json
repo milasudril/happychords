@@ -3,10 +3,10 @@
         "paths_full_reject":[],
         "paths_reject":[
             "..",
+            ".git",
             ".",
-			".git",
-            "__targets",
-			"__targets_rel"
+            "__targets_rel",
+            "__targets"
         ],
         "recursive":1
     },
@@ -35,7 +35,9 @@
                     ],
                     "name":"g++"
                 },
-                "cflags_extra":["march=native"],
+                "cflags_extra":[
+                    "march=native"
+                ],
                 "cflags_format":"-^",
                 "cxxversion_max":-1,
                 "cxxversion_min":201402,
@@ -59,6 +61,7 @@
                     ],
                     "name":"g++"
                 },
+                "include_format":"",
                 "includedir":[],
                 "includedir_format":"-I^",
                 "includedir_noscan":[],
@@ -131,6 +134,75 @@
         },
         {
             "config":{
+                "tar":{
+                    "command":{
+                        "args":[
+                            "{target_strip}",
+                            "{root_append}",
+                            "{compressor}",
+                            "-cf",
+                            "{target}",
+                            "-T",
+                            "-"
+                        ],
+                        "name":"tar"
+                    },
+                    "compressors":{
+                        "bzip2":"-j",
+                        "gzip":"-z",
+                        "lzma":"-J"
+                    },
+                    "root_append":"--transform=s,\\\\(.*\\\\),^\\\\1,g",
+                    "target_strip":"--transform=s,\\^^,,g"
+                },
+                "zip":{
+                    "create":{
+                        "args":[
+                            "-@",
+                            "{target}"
+                        ],
+                        "name":"zip"
+                    },
+                    "rename":{
+                        "args":[
+                            "-w",
+                            "{target}"
+                        ],
+                        "name":"zipnote"
+                    }
+                }
+            },
+            "filename_exts":[
+                ".archive"
+            ],
+            "name":"targetarchive_default",
+            "plugin":"targetarchive"
+        },
+        {
+            "config":{
+                "tohopper":{
+                    "args":[
+                        "{source}",
+                        "{target_directory}"
+                    ],
+                    "name":"lv2spectohpp.php"
+                },
+                "tottler":{
+                    "args":[
+                        "{source}",
+                        "{target_directory}"
+                    ],
+                    "name":"lv2spectottl.php"
+                }
+            },
+            "filename_exts":[
+                ".lv2spec"
+            ],
+            "name":"lv2specdefault",
+            "plugin":"targetlv2spec"
+        },
+        {
+            "config":{
                 "command":{
                     "args":[
                         "--",
@@ -145,32 +217,10 @@
             ],
             "name":"pythondefault",
             "plugin":"targetpython"
-        },
-		{
-			"config": {
-				"tohopper": {
-					"args": [
-						"{source}",
-						"{target_directory}"
-					],
-					"name": "lv2spectohpp.php"
-				},
-				"tottler": {
-					"args": [
-						"{source}",
-						"{target_directory}"
-					],
-					"name": "lv2spectottl.php"
-				}
-			},
-			"filename_exts": [
-				".lv2spec"
-			],
-			"name": "lv2specdefault",
-			"plugin": "targetlv2spec"
-		}
+        }
     ],
     "targetinfo":{
+        "project_root":"",
         "target_directory":"__targets"
     }
 }
