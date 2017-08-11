@@ -33,7 +33,7 @@ namespace Happychords
 			void filterApply(const Framepair* buffer_in
 				,Filter::Params filter
 				,AdsrScaler::Params filter_mod_params
-				,float* buffer_lfo,Framepair* buffer_out,size_t n) noexcept;
+				,const float* buffer_lfo,Framepair* buffer_out,size_t n) noexcept;
 
 			void modulate(const Framepair* buffer_in
 				,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept;
@@ -125,7 +125,7 @@ namespace Happychords
 			{
 			auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
 			auto a_1=mod.stateUpdate(adsr,a_0);
-			amplitude=Framepair{a_0,a_0,a_1,a_0};
+			amplitude=Framepair{a_0,a_0,a_1,a_1};
 
 			*buffer_out=amplitude*(*buffer_in);
 
@@ -142,7 +142,7 @@ namespace Happychords
 	void Voice<N>::filterApply(const Framepair* buffer_in
 		,Filter::Params filter_params
 		,AdsrScaler::Params filter_mod_params
-		,float* buffer_lfo,Framepair* buffer_out,size_t n) noexcept
+		,const float* buffer_lfo,Framepair* buffer_out,size_t n) noexcept
 		{
         auto filter=m_filter;
         auto filter_mod=m_filter_mod;
