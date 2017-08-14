@@ -4,6 +4,7 @@
 #define HAPPYCHORDS_STEREOMIXER_HPP
 
 #include "framepair.hpp"
+#include <utility>
 
 namespace Happychords
 	{
@@ -21,6 +22,14 @@ namespace Happychords
 			n-=2;
 			}
 		}
+		
+	static void addToMix(float buffer_in,float gain,float xi
+		,std::pair<float,float>& buffer_out)
+		{
+		auto xi_vec=std::pair<float,float>(gain*xi,gain*(1.0f - xi));
+		buffer_out.first+=xi_vec.first*buffer_in;
+		buffer_out.second+=xi_vec.second*buffer_in;
+		}
 
 	static void addToMix(const Framepair* buffer_in,Framepair* buffer_out,size_t n)
 		{
@@ -31,6 +40,12 @@ namespace Happychords
 			++buffer_out;
 			n-=2;
 			}
+		}
+		
+	static void addToMix(const std::pair<float,float>& buffer_in,std::pair<float,float>& buffer_out)
+		{
+		buffer_out.first+=buffer_in.first;
+		buffer_out.second+=buffer_in.second;
 		}
 
 	static void mix(const Framepair* buffer_a,const Framepair* buffer_b
@@ -49,6 +64,19 @@ namespace Happychords
 			n-=2;
 			}
 		}
+		
+	static void mix(const std::pair<float,float>& buffer_a
+		,const std::pair<float,float>& buffer_b
+		,float xi
+		,std::pair<float,float>& buffer_out)
+		{
+		auto xi_comp=1.0f - xi;
+		auto v1=buffer_a;
+		auto v2=buffer_b;
+		
+		buffer_out.first=xi_comp*v1.first + xi*v2.first;
+		buffer_out.second=xi_comp*v1.second + xi*v2.second;
+		}
 
 	static void demux(const Framepair* buffer_in,float* buffer_l,float* buffer_r,size_t n)
 		{
@@ -63,6 +91,12 @@ namespace Happychords
 			++buffer_in;
 			n-=2;
 			}
+		}
+		
+	static void demux(const std::pair<float,float>& buffer_in,float& buffer_l,float& buffer_r)
+		{
+		buffer_l=buffer_in.first;
+		buffer_r=buffer_in.second;
 		}
 	}
 

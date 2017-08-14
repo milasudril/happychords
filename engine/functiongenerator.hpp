@@ -18,10 +18,16 @@ namespace Happychords
 
 			void generate(double f,float a,const ArrayStatic<T,N>& source
 				,float* dest,size_t n_frames) noexcept;
+				
+			void generate(double f,float a,const ArrayStatic<T,N>& source,float& dest) noexcept;
 
 			void generate(double f,float a,double phi_0
 				,const ArrayStatic<T,N>& source
 				,float* dest,size_t n_frames) noexcept;
+				
+			void generate(double f,float a,double phi_0
+				,const ArrayStatic<T,N>& source
+				,float& dest) noexcept;
 
 			void phaseSet(double phi) noexcept
 				{
@@ -57,6 +63,18 @@ namespace Happychords
 			}
 		m_phi=phi;
 		}
+		
+	template<class T,size_t N>
+	void FunctionGenerator<T,N>::generate(double f,float a,const ArrayStatic<T,N>& source,float& dest) noexcept
+		{
+		auto phi=m_phi;
+		auto i=static_cast<size_t>(phi);
+		dest=a*source[i];
+		phi+=source.size()*f;
+		if(phi>=source.size())
+			{phi-=source.size();}
+		m_phi=phi;
+		}
 
 	template<class T,size_t N>
 	void FunctionGenerator<T,N>::generate(double f,float a,double phi_0
@@ -77,6 +95,26 @@ namespace Happychords
 				{phi-=source.size();}
 			++dest;
 			}
+		m_phi=phi - phi_0;
+		if(m_phi<0)
+			{m_phi+=source.size();}
+		}
+		
+	template<class T,size_t N>
+	void FunctionGenerator<T,N>::generate(double f,float a,double phi_0
+		,const ArrayStatic<T,N>& source	,float& dest) noexcept
+		{
+		auto phi=m_phi + phi_0;
+		if(phi>=source.size())
+			{phi-=source.size();}
+		
+		auto i=static_cast<size_t>(phi);
+		dest=a*source[i];
+			
+		phi+=source.size()*f;
+		if(phi>=source.size())
+			{phi-=source.size();}
+		
 		m_phi=phi - phi_0;
 		if(m_phi<0)
 			{m_phi+=source.size();}

@@ -29,14 +29,26 @@ namespace Happychords
 			void generate(const ArrayStatic<float,N>& waveform
 				,double detune,bool suboct
 				,float* buffer_temp,Framepair* stereo_out,size_t n) noexcept;
+				
+			void generate(const ArrayStatic<float,N>& waveform
+				,double detune,bool suboct
+				,float& buffer_temp,std::pair<float,float>& stereo_out) noexcept;
 
 			void filterApply(const Framepair* buffer_in
 				,Filter::Params filter
 				,AdsrScaler::Params filter_mod_params
 				,const float* buffer_lfo,Framepair* buffer_out,size_t n) noexcept;
+				
+			void filterApply(const std::pair<float,float>& buffer_in
+				,Filter::Params filter
+				,AdsrScaler::Params filter_mod_params
+				,float buffer_lfo,std::pair<float,float>& buffer_out) noexcept;
 
 			void modulate(const Framepair* buffer_in
 				,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept;
+				
+			void modulate(const std::pair<float,float>& buffer_in
+				,Adsr::Params adsr,std::pair<float,float>& buffer_out) noexcept;
 
 			float amplitude() const noexcept
 				{return m_amplitude.left<0>();}
@@ -115,6 +127,40 @@ namespace Happychords
 				}
 			}
 		}
+		
+
+	template<size_t N>				
+	void Voice<N>::generate(const ArrayStatic<float,N>& waveform
+		,double detune,bool suboct
+		,float& buffer_temp,std::pair<float,float>& stereo_out) noexcept
+		{
+		auto d_xi=1.0/(m_generators.size() - 1);
+		auto df=std::exp2(detune*d_xi/12.0);
+		auto f_0=std::exp2(-0.5*detune/12.0);
+		auto f_base=m_f;
+		auto a=m_gain;
+		auto gain=2.0f/m_generators.size();
+		f_base*=f_0;
+
+		if(suboct)
+			{
+			for(size_t k=0;k<m_generators.size();++k)
+				{
+				m_generators[k].generate(k%2?0.5f*f_base:f_base,a,waveform,buffer_temp);
+				f_base*=df;
+				addToMix(buffer_temp,gain,k*d_xi,stereo_out);
+				}
+			}
+		else
+			{
+			for(size_t k=0;k<m_generators.size();++k)
+				{
+				m_generators[k].generate(f_base,a,waveform,buffer_temp);
+				f_base*=df;
+				addToMix(buffer_temp,gain,k*d_xi,stereo_out);
+				}
+			}		
+		}
 
 	template<size_t N>
 	void Voice<N>::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buffer_out,size_t n) noexcept
@@ -136,6 +182,20 @@ namespace Happychords
 			}
 		m_amplitude=amplitude;
 		m_modulator=mod;
+		}
+		
+	template<size_t N>
+	void Voice<N>::modulate(const std::pair<float,float>& buffer_in
+		,Adsr::Params adsr,std::pair<float,float>& buffer_out) noexcept
+		{
+		auto mod=m_modulator;
+		auto amplitude=m_amplitude;
+		auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
+		amplitude=Framepair{a_0,a_0,a_0,a_0};
+		buffer_out.first=a_0*buffer_in.first;
+		buffer_out.second=a_0*buffer_in.second;
+		m_amplitude=amplitude;
+		m_modulator=mod;		
 		}
 
 	template<size_t N>
@@ -167,6 +227,29 @@ namespace Happychords
 		m_filter_mod=filter_mod;
         m_filter=filter;
 		}
+	
+	template<size_t N>
+	void Voice<N>::filterApply(const std::pair<float,float>& buffer_in
+		,Filter::Params filter_params,AdsrScaler::Params filter_mod_params
+		,float lfo,std::pair<float,float>& buffer_out) noexcept
+		{
+        auto filter=m_filter;
+        auto filter_mod=m_filter_mod;
+		auto keytrack=m_keytrack;
+		auto omega_0=filter_params.omega_0();
+		auto f_0=filter_mod.stateUpdate(filter_mod_params,m_f_0);
+        filter_params.omega_0()=omega_0 * f_0 * keytrack * lfo;
+        auto a=filter.stateUpdate(filter_params,buffer_in);
+		buffer_out=a;
+
+		m_f_0=f_0;
+		m_filter_mod=filter_mod;
+        m_filter=filter;		
+		}
+		
+
+	
+	
 	}
 
 #endif

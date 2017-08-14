@@ -351,6 +351,32 @@ void Engine::generate(size_t n_frames) noexcept
 		if(n_frames==1)
 			{break;}
 		}
+	
+	if(n_frames==1) //Fix remaining stuff
+		{
+		float lfo;
+		LFO.generate(lfo_freq,1.0f,lfo_phase,waveform_lfo,lfo);
+		lfo=std::exp2(lfo * filter_lfo);
+		std::pair<float,float> bufftemp[3];
+		bufftemp[2]={0.0f,0.0f};
+		for(size_t k=0;k<voices.size();++k)
+			{
+			if(voices[k].amplitude()>1e-3f || voices[k].started())
+				{
+				float buffer_in;
+				bufftemp[0]={0.0f,0.0f};
+				
+				voices[k].generate(waveform,detune,suboct,buffer_in,bufftemp[0]);
+				voices[k].filterApply(bufftemp[0],filter,filter_adsr,lfo,bufftemp[1]);
+				voices[k].modulate(bufftemp[1],voice_adsr,bufftemp[0]);
+				
+				addToMix(bufftemp[0],bufftemp[2]);
+				}
+			}
+		m_gate.modulate(bufftemp[2],gate_adsr,bufftemp[1]);
+		mix(bufftemp[2],bufftemp[1],portmap().get<Ports::GATE_DEPTH>(),bufftemp[1]);
+		demux(bufftemp[1],*buffer_l,*buffer_r);
+		}
 	}
 
 void Engine::process(size_t n_frames) noexcept

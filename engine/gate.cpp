@@ -71,12 +71,42 @@ void Gate::modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buff
 			}
 		auto a_1=mod.stateUpdate(adsr,a_0);
 
-		amplitude=Framepair{a_0,a_0,a_1,a_0};
+		amplitude=Framepair{a_0,a_0,a_1,a_1};
 		*buffer_out=amplitude*(*buffer_in);
 		++buffer_out;
 		++buffer_in;
 		n-=2;
 		}
+	m_seq_pos=seq_pos;
+	m_seq_current=seq_current;
+	m_amplitude=amplitude;
+	m_modulator=mod;
+	}
+	
+void Gate::modulate(const std::pair<float,float>& buffer_in,Adsr::Params adsr
+	,std::pair<float,float>& buffer_out) noexcept
+	{
+	auto mod=m_modulator;
+	auto amplitude=m_amplitude;
+	auto seq_current=m_seq_current;
+	auto seq_begin=m_seq_begin;
+	auto seq_end=m_seq_end;
+	auto seq_pos=m_seq_pos;
+	auto time_scale=m_timescale;
+
+	seq_current=eventsProcess(seq_current,seq_end,seq_pos,mod);
+	seq_pos+=time_scale;
+	if(seq_current==seq_end)
+		{
+		seq_current=seq_begin;
+		seq_pos=0;
+		}
+	auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
+
+	amplitude=Framepair{a_0,a_0,a_0,a_0};
+	buffer_out.first=a_0*buffer_in.first;
+	buffer_out.second=a_0*buffer_in.second;
+
 	m_seq_pos=seq_pos;
 	m_seq_current=seq_current;
 	m_amplitude=amplitude;

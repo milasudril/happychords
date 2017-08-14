@@ -30,6 +30,9 @@ namespace Happychords
 
 			void modulate(const Framepair* buffer_in,Adsr::Params adsr,Framepair* buffer_out
 				,size_t n) noexcept;
+				
+			void modulate(const std::pair<float,float>& buffer_in,Adsr::Params adsr
+				,std::pair<float,float>& buffer_out) noexcept;
 
 			void positionSet(double beat) noexcept
 				{
