@@ -375,6 +375,8 @@ void Engine::generate(size_t n_frames) noexcept
 			}
 		m_gate.modulate(bufftemp[2],gate_adsr,bufftemp[1]);
 		mix(bufftemp[2],bufftemp[1],portmap().get<Ports::GATE_DEPTH>(),bufftemp[1]);
+		bufftemp[1].first*=main_gain;
+		bufftemp[1].second*=main_gain;
 		demux(bufftemp[1],*buffer_l,*buffer_r);
 		}
 	}

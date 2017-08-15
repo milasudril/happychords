@@ -17,7 +17,7 @@ namespace Happychords
 	class PRIVATE Voice
 		{
 		public:
-			Voice():m_amplitude(0.0f,0.0f,0.0f,0.0f),m_f(0),m_gain(0),m_f_0(0)
+			Voice():m_amplitude(0.0f),m_f(0),m_gain(0),m_f_0(0)
 				,m_keytrack(1.0f),m_key(-1)
 				{
 				std::random_device rd;
@@ -51,7 +51,7 @@ namespace Happychords
 				,Adsr::Params adsr,std::pair<float,float>& buffer_out) noexcept;
 
 			float amplitude() const noexcept
-				{return m_amplitude.left<0>();}
+				{return m_amplitude;}
 
 			void start(float f,float a,float keytrack,int8_t key) noexcept
 				{
@@ -59,7 +59,7 @@ namespace Happychords
 				m_gain=a;
 				m_modulator.attack();
 				m_filter.stateReset();
-				m_amplitude=Framepair{0.0f,0.0f,0.0f,0.0f};
+				m_amplitude=0.0f;
 				m_key=key;
 				m_keytrack=std::exp2((key-69)*keytrack/12.0f);
 				m_f_0=1.0f;
@@ -80,7 +80,7 @@ namespace Happychords
 
 		private:
 			ArrayStatic<FunctionGenerator<float,N>,11> m_generators;
-			Framepair m_amplitude;
+			float m_amplitude;
 			float m_f;
 			float m_gain;
 			Adsr m_modulator;
@@ -169,11 +169,12 @@ namespace Happychords
 		auto amplitude=m_amplitude;
 		while(n!=0)
 			{
-			auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
+			auto a_0=mod.stateUpdate(adsr,amplitude);
 			auto a_1=mod.stateUpdate(adsr,a_0);
-			amplitude=Framepair{a_0,a_0,a_1,a_1};
+			amplitude=a_1;
+			auto a_vec=Framepair{a_0,a_0,a_1,a_1};
 
-			*buffer_out=amplitude*(*buffer_in);
+			*buffer_out=a_vec*(*buffer_in);
 
 			++buffer_out;
 			++buffer_in;
@@ -190,11 +191,10 @@ namespace Happychords
 		{
 		auto mod=m_modulator;
 		auto amplitude=m_amplitude;
-		auto a_0=mod.stateUpdate(adsr,amplitude.left<1>());
-		amplitude=Framepair{a_0,a_0,a_0,a_0};
+		auto a_0=mod.stateUpdate(adsr,amplitude);
 		buffer_out.first=a_0*buffer_in.first;
 		buffer_out.second=a_0*buffer_in.second;
-		m_amplitude=amplitude;
+		m_amplitude=a_0;
 		m_modulator=mod;		
 		}
 
@@ -214,9 +214,11 @@ namespace Happychords
 			f_0=filter_mod.stateUpdate(filter_mod_params,f_0);
             filter_params.omega_0()=omega_0 * f_0 * keytrack * (*buffer_lfo);
             auto a=filter.stateUpdate(filter_params,{buffer_in->left<0>(),buffer_in->right<0>()});
+		
 			f_0=filter_mod.stateUpdate(filter_mod_params,f_0);
 			filter_params.omega_0()=omega_0 * f_0 * keytrack * (*(buffer_lfo + 1));
             auto b=filter.stateUpdate(filter_params,{buffer_in->left<1>(),buffer_in->right<1>()});
+		
             *buffer_out=Framepair{a.first,a.second,b.first,b.second};
             ++buffer_in;
             ++buffer_out;
@@ -237,6 +239,7 @@ namespace Happychords
         auto filter_mod=m_filter_mod;
 		auto keytrack=m_keytrack;
 		auto omega_0=filter_params.omega_0();
+		
 		auto f_0=filter_mod.stateUpdate(filter_mod_params,m_f_0);
         filter_params.omega_0()=omega_0 * f_0 * keytrack * lfo;
         auto a=filter.stateUpdate(filter_params,buffer_in);
@@ -246,10 +249,6 @@ namespace Happychords
 		m_filter_mod=filter_mod;
         m_filter=filter;		
 		}
-		
-
-	
-	
 	}
 
 #endif
